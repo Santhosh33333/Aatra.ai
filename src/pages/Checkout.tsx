@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import { Check } from 'lucide-react';
 import { PAYMENT_PLANS, OFFERS, ADMIN_EMAIL } from '../lib/paymentPlans';
+import { createRazorpayOrder, loadRazorpayScript, RAZORPAY_CONFIG, RAZORPAY_PLANS } from '../lib/razorpay';
 
 export default function Checkout() {
   const [searchParams] = useSearchParams();
@@ -10,6 +11,11 @@ export default function Checkout() {
   const [selectedOffer, setSelectedOffer] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Load Razorpay script on component mount
+  useEffect(() => {
+    loadRazorpayScript();
+  }, []);
 
   const plan = PAYMENT_PLANS.find(p => p.id === planId);
   if (!plan) return <div className="min-h-screen bg-[#080c18]" />;
@@ -23,35 +29,44 @@ export default function Checkout() {
     setLoading(true);
     setError(null);
     try {
-      // Stripe integration - Vercel Production
-      if (plan.stripePriceId) {
-        const response = await fetch('/api/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            priceId: plan.stripePriceId,
-            planId: plan.id,
-            selectedOffer,
-          }),
-        });
+      console.log('[v0] Starting Razorpay checkout for plan:', planId);
+      
+      // Create Razorpay order
+      const razorpayPlanId = `${planId.replace('-', '_')}_monthly`; // Convert pro to pro_monthly
+      const orderData = await createRazorpayOrder(razorpayPlanId, 'customer@example.com');
+      
+      // Open Razorpay Checkout
+      if (window.Razorpay) {
+        const options = {
+          key: RAZORPAY_CONFIG.keyId,
+          amount: RAZORPAY_PLANS[razorpayPlanId as keyof typeof RAZORPAY_PLANS]?.amount,
+          currency: RAZORPAY_CONFIG.currency,
+          name: 'Astra AI',
+          description: plan.name + ' Plan',
+          order_id: orderData.orderId,
+          handler: (response: any) => {
+            console.log('[v0] Payment successful:', response);
+            // Verify payment and activate subscription
+            navigate('/checkout-success?orderId=' + orderData.orderId);
+          },
+          prefill: {
+            name: '',
+            email: '',
+            contact: '',
+          },
+          notes: {
+            planId,
+            offer: selectedOffer,
+          },
+          theme: {
+            color: '#ffb340',
+          },
+        };
 
-        if (!response.ok) {
-          throw new Error('Failed to create checkout session');
-        }
-
-        const { sessionId, url } = await response.json();
-        
-        // Redirect to Stripe Checkout
-        if (url) {
-          window.location.href = url;
-        }
+        const razorpayInstance = new window.Razorpay(options);
+        razorpayInstance.open();
       } else {
-        // Fallback: Send email for payment
-        const offerText = selectedOffer ? ` with ${selectedOffer} offer` : '';
-        const message = `Checkout for ${plan.name} plan ($${plan.price}/month)${offerText}`;
-        console.log('[v0] Payment:', message);
-        
-        window.location.href = `mailto:${ADMIN_EMAIL}?subject=Astra AI - ${plan.name} Plan Purchase&body=I would like to purchase the ${plan.name} plan for $${plan.price}/month${offerText}.`;
+        throw new Error('Razorpay not loaded');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Payment error occurred');
