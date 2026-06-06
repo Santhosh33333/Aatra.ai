@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router';
 import { useAuth } from '@clerk/clerk-react';
 import Navigation from './sections/Navigation';
 import Hero from './sections/Hero';
+import BrandShowcase from './sections/BrandShowcase';
 import Pricing from './sections/Pricing';
 import Footer from './sections/Footer';
 import ChatWidget from './sections/ChatWidget';
@@ -38,6 +39,7 @@ function HomePage() {
       <Navigation />
       <main>
         <Hero />
+        <BrandShowcase />
         <Suspense fallback={<div className="h-96 bg-[#080c18]" />}>
           <ShowOff />
           <Proof />
