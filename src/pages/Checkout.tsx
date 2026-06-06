@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import { Check } from 'lucide-react';
 import { PAYMENT_PLANS, OFFERS, ADMIN_EMAIL } from '../lib/paymentPlans';
-import { createInstamojPayment } from '../lib/instamojo';
+import { createPayment, type GatewayType, GATEWAYS } from '../lib/payment-gateways';
 
 export default function Checkout() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const planId = searchParams.get('plan') || 'pro';
+  const gatewayParam = (searchParams.get('gateway') || 'instamojo') as GatewayType;
+  const [selectedGateway, setSelectedGateway] = useState<GatewayType>(gatewayParam);
   const [selectedOffer, setSelectedOffer] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,19 +33,25 @@ export default function Checkout() {
     setLoading(true);
     setError(null);
     try {
-      console.log('[v0] Starting Instamojo payment for plan:', planId);
+      console.log('[v0] Starting payment with gateway:', selectedGateway);
       
-      // Create Instamojo payment
       const instamojoPlanId = `${planId.replace('-', '_')}_monthly`;
-      const paymentData = await createInstamojPayment(instamojoPlanId, email, phone);
-      
-      // Redirect to payment link
-      if (paymentData.payment_url) {
-        console.log('[v0] Redirecting to Instamojo:', paymentData.payment_url);
-        window.location.href = paymentData.payment_url;
-      } else {
-        throw new Error('Payment URL not received');
+      const paymentData = await createPayment({
+        gateway: selectedGateway,
+        planId: instamojoPlanId,
+        email,
+        phone,
+        amount: plan.price * 100, // Convert to paise
+        currency: 'INR',
+        description: plan.name,
+      });
+
+      if (!paymentData.success || !paymentData.payment_url) {
+        throw new Error(paymentData.error || 'Payment creation failed');
       }
+
+      console.log('[v0] Redirecting to payment gateway:', selectedGateway);
+      window.location.href = paymentData.payment_url;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Payment error occurred');
       console.error('[v0] Checkout error:', err);
@@ -145,6 +153,27 @@ export default function Checkout() {
               </div>
 
               <div className="border-t border-white/10 pt-6 mb-6">
+                {/* Payment Gateway Selection */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium mb-3">Payment Gateway</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(GATEWAYS).map(([key, gateway]) => (
+                      <button
+                        key={key}
+                        onClick={() => setSelectedGateway(key as GatewayType)}
+                        className={`p-3 rounded-lg border-2 transition-all text-xs font-semibold ${
+                          selectedGateway === key
+                            ? 'bg-amber-500/20 border-amber-400 text-amber-300'
+                            : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
+                        }`}
+                      >
+                        {gateway.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Email and Phone Fields */}
                 <div className="space-y-3 mb-6">
                   <div>
                     <label className="block text-sm font-medium mb-2">Email</label>
