@@ -9,8 +9,15 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Support /admin route in SPA
-  server: {
-    historyApiFallback: true,
+  build: {
+    target: 'esnext',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'gsap': ['gsap'],
+          'clerk': ['@clerk/clerk-react'],
+        },
+      },
+    },
   },
 })
