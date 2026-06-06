@@ -1,9 +1,12 @@
 import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Check } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
+
+const ADMIN_EMAIL = 'santhoshkrishna958@gmail.com';
 
 const plans = [
   {
@@ -13,13 +16,15 @@ const plans = [
     description: 'Perfect for getting started',
     featured: false,
     features: [
-      '100 messages per day',
+      '20 messages per day',
       'Basic AI responses',
       '1 custom theme',
       'Text chat only',
     ],
-    cta: 'Get Started',
+    cta: 'Get Started Free',
     ctaStyle: 'secondary' as const,
+    action: 'signup',
+    subject: '',
   },
   {
     name: 'Pro',
@@ -36,6 +41,8 @@ const plans = [
     ],
     cta: 'Upgrade to Pro',
     ctaStyle: 'primary' as const,
+    action: 'contact',
+    subject: 'Pro Plan - Upgrade Request',
   },
   {
     name: 'Ultra',
@@ -52,17 +59,30 @@ const plans = [
     ],
     cta: 'Go Ultra',
     ctaStyle: 'secondary' as const,
+    action: 'contact',
+    subject: 'Ultra Plan - Upgrade Request',
   },
 ];
 
 export default function Pricing() {
+  const navigate = useNavigate();
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
+  const handleClick = (plan: typeof plans[0]) => {
+    if (plan.action === 'signup') {
+      navigate('/sign-up');
+    } else if (plan.action === 'contact') {
+      const body = encodeURIComponent(
+        `Hi,\n\nI would like to upgrade to the ${plan.name} plan (${plan.price}/month).\n\nPlease get back to me with payment details.\n\nThank you!`
+      );
+      window.location.href = `mailto:${ADMIN_EMAIL}?subject=${encodeURIComponent(plan.subject)}&body=${body}`;
+    }
+  };
+
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Header animation
       gsap.fromTo(
         headerRef.current?.children || [],
         { opacity: 0, y: 40 },
@@ -79,7 +99,6 @@ export default function Pricing() {
         }
       );
 
-      // Cards animation
       cardsRef.current.forEach((card, i) => {
         if (card) {
           gsap.fromTo(
@@ -171,10 +190,11 @@ export default function Pricing() {
 
               {/* CTA Button */}
               <button
-                className={`w-full mt-8 py-3 rounded-full text-sm font-semibold transition-all duration-200 ${
+                onClick={() => handleClick(plan)}
+                className={`w-full mt-8 py-3 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer ${
                   plan.ctaStyle === 'primary'
                     ? 'bg-amber text-navy hover:bg-amber-light hover:scale-[1.02] active:scale-[0.98]'
-                    : 'bg-white/10 text-white border border-white/20 hover:bg-white/[0.15] hover:border-white/30'
+                    : 'bg-white/10 text-white border border-white/20 hover:bg-white/[0.15] hover:border-white/30 hover:scale-[1.02] active:scale-[0.98]'
                 }`}
               >
                 {plan.cta}
