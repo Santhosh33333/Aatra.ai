@@ -1,6 +1,7 @@
-import { useEffect, useRef, memo } from 'react';
+import { useEffect, useRef, memo, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { logger } from '../lib/logger';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,9 +14,16 @@ const chatMessages = [
 function ShowOff() {
   const sectionRef = useRef<HTMLElement>(null);
   const phoneRef = useRef<HTMLDivElement>(null);
+  const [showLogs, setShowLogs] = useState(true);
+  const [logs, setLogs] = useState<string[]>([]);
 
   useEffect(() => {
+    // Log when ShowOff section loads
+    logger.info('[ShowOff] Component mounted - Astra showcase loading');
+    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] [ShowOff] Component mounted`]);
+    
     const ctx = gsap.context(() => {
+      logger.debug('[ShowOff] Animating phone element');
       gsap.fromTo(
         phoneRef.current,
         { opacity: 0, y: 40 },
@@ -27,12 +35,27 @@ function ShowOff() {
           scrollTrigger: {
             trigger: sectionRef.current,
             start: 'top 80%',
+            onEnter: () => {
+              logger.info('[ShowOff] Phone animation triggered');
+              setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] [ShowOff] Animation triggered`]);
+            }
           },
         }
       );
     }, sectionRef);
 
     return () => ctx.revert();
+  }, []);
+
+  const addLog = (message: string) => {
+    const timestamp = new Date().toLocaleTimeString();
+    const fullLog = `[${timestamp}] ${message}`;
+    setLogs(prev => [...prev.slice(-9), fullLog]); // Keep last 10 logs
+  };
+
+  useEffect(() => {
+    logger.success('[ShowOff] Chat messages loaded');
+    addLog('[ShowOff] Chat interface rendered');
   }, []);
 
   return (
@@ -42,19 +65,20 @@ function ShowOff() {
     >
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #00c8ff, transparent)' }} />
 
-      <div className="relative z-10 max-w-[1200px] mx-auto px-6 lg:px-12">
-        <div className="flex flex-col md:flex-row items-center justify-center gap-12">
-          <div ref={phoneRef} className="relative opacity-0">
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left: Phone Mock */}
+          <div ref={phoneRef} className="relative opacity-0 flex justify-center">
             <div className="w-[260px] h-[480px] bg-navy-dark rounded-[40px] border border-white/10 overflow-hidden shadow-lg">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-6 bg-navy rounded-b-[16px] z-10" />
               <div className="h-[48px] bg-navy-dark border-b border-white/5 flex items-center px-4 gap-2 mt-1">
                 <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber to-cyan" />
                 <div>
                   <div className="text-xs font-semibold text-white">Astra</div>
-                  <div className="text-[9px] text-gray-400">Online</div>
+                  <div className="text-[9px] text-green-400">Online</div>
                 </div>
               </div>
-              <div className="p-3 space-y-2" style={{ height: 'calc(100% - 102px)' }}>
+              <div className="p-3 space-y-2 overflow-y-auto" style={{ height: 'calc(100% - 102px)' }}>
                 {chatMessages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[75%] px-3 py-1.5 text-xs rounded-lg ${msg.sender === 'user' ? 'bg-amber-500/40 text-white' : 'bg-white/10 text-gray-300'}`}>
@@ -69,13 +93,60 @@ function ShowOff() {
             </div>
           </div>
 
-          <div className="text-center md:text-left">
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Smart Conversations</h3>
-            <p className="text-gray-400 mb-4">AI that understands context and emotions</p>
+          {/* Right: Content */}
+          <div className="space-y-6">
             <div>
-              <div className="text-3xl font-bold text-amber">10M+</div>
-              <div className="text-sm text-gray-400">Active Users</div>
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Smart Conversations</h3>
+              <p className="text-gray-400 mb-4">AI that understands context and emotions in real-time</p>
+              <div className="space-y-3">
+                <div>
+                  <div className="text-3xl font-bold bg-gradient-to-r from-amber-400 to-cyan-400 bg-clip-text text-transparent">10M+</div>
+                  <div className="text-sm text-gray-400">Active Users</div>
+                </div>
+              </div>
             </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
+                <div className="text-sm text-gray-400 mb-1">Response Time</div>
+                <div className="text-xl font-bold text-green-400">45ms</div>
+                <div className="text-xs text-gray-500">Optimal</div>
+              </div>
+              <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
+                <div className="text-sm text-gray-400 mb-1">Accuracy</div>
+                <div className="text-xl font-bold text-cyan-400">99.8%</div>
+                <div className="text-xs text-gray-500">Excellent</div>
+              </div>
+            </div>
+
+            {/* Log Viewer Toggle */}
+            <button
+              onClick={() => {
+                setShowLogs(!showLogs);
+                logger.info(`[ShowOff] Log viewer ${!showLogs ? 'opened' : 'closed'}`);
+                addLog(`[ShowOff] Log viewer toggled`);
+              }}
+              className="w-full px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 rounded-lg border border-amber-500/30 text-sm font-medium transition-colors"
+            >
+              {showLogs ? '▼ Hide Logs' : '▶ Show Logs'} ({logs.length})
+            </button>
+
+            {/* Log Viewer */}
+            {showLogs && (
+              <div className="p-4 bg-black/40 border border-white/10 rounded-lg max-h-48 overflow-y-auto font-mono text-xs space-y-1">
+                <div className="text-gray-500 mb-2">Activity Logs:</div>
+                {logs.length === 0 ? (
+                  <div className="text-gray-600">Waiting for activity...</div>
+                ) : (
+                  logs.map((log, idx) => (
+                    <div key={idx} className="text-gray-400 hover:text-green-400 transition-colors">
+                      {log}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
