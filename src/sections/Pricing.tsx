@@ -10,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger);
 const plans = [
   {
     name: 'Mini',
-    price: '$0',
+    price: '₹0',
     period: '/month',
     description: 'Perfect for getting started',
     featured: false,
@@ -27,7 +27,7 @@ const plans = [
   },
   {
     name: 'Pro',
-    price: '$9',
+    price: '₹900',
     period: '/month',
     description: 'Best for daily chatters',
     featured: true,
@@ -45,7 +45,7 @@ const plans = [
   },
   {
     name: 'Ultra',
-    price: '$19',
+    price: '₹1,900',
     period: '/month',
     description: 'For power users',
     featured: false,

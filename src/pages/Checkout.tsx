@@ -79,12 +79,12 @@ export default function Checkout() {
               <div className="border-t border-white/10 pt-6">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-gray-400">Monthly price:</span>
-                  <span className="text-3xl font-bold">${plan.price}</span>
+                  <span className="text-3xl font-bold">₹{plan.price}</span>
                 </div>
                 {plan.originalPrice && (
                   <div className="flex justify-between items-center text-sm text-green-400">
                     <span>You save:</span>
-                    <span>${plan.originalPrice - plan.price}/month</span>
+                    <span>₹{plan.originalPrice - plan.price}/month</span>
                   </div>
                 )}
               </div>
@@ -115,8 +115,8 @@ export default function Checkout() {
                       </div>
                       {offer.discountedPrice && (
                         <div className="text-right">
-                          <div className="font-bold">${offer.discountedPrice}</div>
-                          <div className="text-sm text-gray-400">was ${offer.originalPrice}</div>
+                          <div className="font-bold">₹{offer.discountedPrice}</div>
+                          <div className="text-sm text-gray-400">was ₹{offer.originalPrice}</div>
                         </div>
                       )}
                     </label>
@@ -134,12 +134,12 @@ export default function Checkout() {
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-400">{plan.name} Plan</span>
-                  <span>${plan.price}/mo</span>
+                  <span>₹{plan.price}/mo</span>
                 </div>
                 {selectedOffer && (
                   <div className="flex justify-between text-green-400">
                     <span>{selectedOffer}</span>
-                    <span>-${OFFERS.find(o => o.id === selectedOffer)?.savings || 0}</span>
+                    <span>-₹{OFFERS.find(o => o.id === selectedOffer)?.savings || 0}</span>
                   </div>
                 )}
               </div>
