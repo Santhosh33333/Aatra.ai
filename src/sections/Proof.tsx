@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Lock, Users, Globe } from 'lucide-react';
+import { Lock, Users, Globe, Sparkles } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -135,17 +135,8 @@ export default function Proof() {
 
           {/* Center Logo */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-amber to-cyan flex items-center justify-center shadow-glow-strong">
-              <img 
-                src="/app-logo.png" 
-                alt="Astra" 
-                className="w-10 h-10 md:w-14 md:h-14" 
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  img.style.display = 'none';
-                }}
-                loading="lazy"
-              />
+            <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-amber to-cyan flex items-center justify-center shadow-glow-strong hover:scale-110 transition-transform duration-300">
+              <Sparkles size={40} className="text-[#080c18] md:w-14 md:h-14" strokeWidth={1.5} />
             </div>
           </div>
 
@@ -174,18 +165,43 @@ export default function Proof() {
         {/* App Screenshot */}
         <div
           ref={screenshotRef}
-          className="mt-16 md:mt-20 w-full max-w-[800px] opacity-0"
+          className="mt-16 md:mt-20 w-full max-w-[800px] opacity-0 rounded-3xl overflow-hidden border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.5)]"
         >
-          <img
-            src="/app-screenshot.png"
-            alt="Astra Chat App Interface"
-            className="w-full rounded-3xl border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.5)]"
-            onError={(e) => {
-              const img = e.target as HTMLImageElement;
-              img.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22400%22%3E%3Crect fill=%22%231e2332%22 width=%22800%22 height=%22400%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2224%22 fill=%22%2388a5d8%22 font-family=%22Arial%22%3EApp Screenshot%3C/text%3E%3C/svg%3E';
-            }}
-            loading="lazy"
-          />
+          <svg 
+            viewBox="0 0 800 400" 
+            className="w-full h-auto bg-gradient-to-b from-navy-dark to-[#1e2332]"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* Header bar */}
+            <rect width="800" height="50" fill="#0f1420" opacity="0.8"/>
+            <circle cx="30" cy="25" r="8" fill="#88a5d8" opacity="0.6"/>
+            <circle cx="55" cy="25" r="8" fill="#88a5d8" opacity="0.4"/>
+            <circle cx="80" cy="25" r="8" fill="#88a5d8" opacity="0.2"/>
+            
+            {/* Chat bubbles */}
+            <g>
+              {/* AI message 1 */}
+              <rect x="50" y="80" width="300" height="40" rx="8" fill="#1e3a5f" opacity="0.6"/>
+              <text x="70" y="105" fontSize="14" fill="#88a5d8" fontFamily="Arial">How can I help you today?</text>
+              
+              {/* User message 1 */}
+              <rect x="450" y="130" width="300" height="40" rx="8" fill="#ffa340" opacity="0.2"/>
+              <text x="470" y="155" fontSize="14" fill="#ffa340" fontFamily="Arial">Help me write an email</text>
+              
+              {/* AI message 2 */}
+              <rect x="50" y="180" width="320" height="50" rx="8" fill="#1e3a5f" opacity="0.6"/>
+              <text x="70" y="205" fontSize="14" fill="#88a5d8" fontFamily="Arial">I'll help you draft a professional</text>
+              <text x="70" y="225" fontSize="14" fill="#88a5d8" fontFamily="Arial">email with perfect tone.</text>
+              
+              {/* User message 2 */}
+              <rect x="480" y="240" width="270" height="40" rx="8" fill="#ffa340" opacity="0.2"/>
+              <text x="500" y="265" fontSize="14" fill="#ffa340" fontFamily="Arial">Make it formal please</text>
+            </g>
+            
+            {/* Astra branding */}
+            <circle cx="400" cy="340" r="20" fill="none" stroke="#00c8ff" strokeWidth="2" opacity="0.4"/>
+            <text x="400" y="350" fontSize="16" fill="#88a5d8" fontFamily="Arial" textAnchor="middle" fontWeight="bold">Astra AI</text>
+          </svg>
         </div>
 
         {/* Mobile floating cards */}

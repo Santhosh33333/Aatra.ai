@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Twitter, Github, Linkedin, MessageCircle } from 'lucide-react';
+import { Twitter, Github, Linkedin, MessageCircle, Sparkles } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -72,17 +72,10 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-16">
           {/* Brand */}
           <div>
-            <a href="#" className="flex items-center gap-3 mb-3">
-              <img 
-                src="/app-logo.png" 
-                alt="Astra" 
-                className="w-6 h-6" 
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  img.style.display = 'none';
-                }}
-                loading="lazy"
-              />
+            <a href="#" className="flex items-center gap-3 mb-3 group">
+              <div className="w-6 h-6 rounded bg-gradient-to-br from-amber to-cyan flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Sparkles size={14} className="text-[#080c18]" strokeWidth={2} />
+              </div>
               <span className="text-white font-semibold text-base">Astra</span>
             </a>
             <p className="text-sm text-gray-muted">
