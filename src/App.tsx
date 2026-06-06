@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router';
+import { Routes, Route, Navigate } from 'react-router';
 import { useAuth } from '@clerk/clerk-react';
 import Hero from './sections/Hero';
 import BrandShowcase from './sections/BrandShowcase';
@@ -57,25 +57,6 @@ function HomePage() {
   );
 }
 
-// Auth redirect component - must be inside Router
-function AuthRedirect() {
-  const location = useLocation();
-  const { isSignedIn, isLoaded } = useAuth();
-
-  useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      if (location.pathname === '/sign-in' || location.pathname === '/sign-up') {
-        logger.info('[Navigation] User already signed in, redirecting to dashboard', { from: location.pathname });
-        if (typeof window !== 'undefined') {
-          window.location.href = '/dashboard';
-        }
-      }
-    }
-  }, [isSignedIn, isLoaded, location.pathname]);
-
-  return null;
-}
-
 export default function App() {
   useEffect(() => {
     logger.info('[Navigation] App mounted');
@@ -83,7 +64,6 @@ export default function App() {
 
   return (
     <>
-      <AuthRedirect />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/sign-in" element={
