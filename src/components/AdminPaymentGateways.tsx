@@ -102,20 +102,24 @@ export default function AdminPaymentGateways() {
 
         {/* Gateway Tabs */}
         <div className="grid grid-cols-4 gap-4 mb-8">
-          {Object.entries(GATEWAYS).map(([key, g]) => (
-            <button
-              key={key}
-              onClick={() => setSelectedGateway(key as GatewayType)}
-              className={`p-4 rounded-lg border-2 transition-all ${
-                selectedGateway === key
-                  ? 'bg-amber-500/20 border-amber-400 text-white'
-                  : 'bg-slate-700/50 border-slate-600 text-gray-300 hover:border-slate-500'
-              }`}
-            >
-              <div className="font-semibold">{g.name}</div>
-              <div className="text-xs mt-2 opacity-75">{g.description.substring(0, 40)}...</div>
-            </button>
-          ))}
+          {Object.entries(GATEWAYS).map(([key, g]) => {
+            const logoPath = `/logos/${key}-logo.png`;
+            return (
+              <button
+                key={key}
+                onClick={() => setSelectedGateway(key as GatewayType)}
+                className={`p-4 rounded-lg border-2 transition-all flex flex-col items-center ${
+                  selectedGateway === key
+                    ? 'bg-amber-500/20 border-amber-400 text-white'
+                    : 'bg-slate-700/50 border-slate-600 text-gray-300 hover:border-slate-500'
+                }`}
+              >
+                <img src={logoPath} alt={g.name} className="w-12 h-12 mb-2 rounded" />
+                <div className="font-semibold text-center">{g.name}</div>
+                <div className="text-xs mt-2 opacity-75 text-center">{g.description.substring(0, 35)}...</div>
+              </button>
+            );
+          })}
         </div>
 
         {/* Main Content */}

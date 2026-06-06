@@ -13,6 +13,7 @@ const ShowOff = lazy(() => import('./sections/ShowOff'));
 const Proof = lazy(() => import('./sections/Proof'));
 const Features = lazy(() => import('./sections/Features'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
+const AdminGateways = lazy(() => import('./pages/admin-gateways'));
 const SignInPage = lazy(() => import('./pages/SignInPage'));
 const SignUpPage = lazy(() => import('./pages/SignUpPage'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -73,6 +74,11 @@ export default function App() {
       <Route path="/admin" element={
         <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
           <AdminPanel />
+        </Suspense>
+      } />
+      <Route path="/admin-gateways" element={
+        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
+          <AdminGateways />
         </Suspense>
       } />
       <Route path="/checkout" element={
