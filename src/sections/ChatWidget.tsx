@@ -166,19 +166,19 @@ export default function ChatWidget() {
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 flex-shrink-0"
             style={{ background: 'linear-gradient(135deg,rgba(255,179,64,0.12),rgba(0,200,255,0.12))', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-cyan-400 flex items-center justify-center shadow-lg">
+            <div className="flex items-center gap-3 flex-1">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-cyan-400 flex items-center justify-center shadow-lg flex-shrink-0">
                 <span className="text-sm font-bold text-[#080c18]">A</span>
               </div>
-              <div>
-                <div className="text-sm font-semibold text-white">{settings.siteName || 'Astra AI'}</div>
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-white truncate">{settings.siteName || 'Astra AI'}</div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[11px] text-gray-500">Online · {limit - usage} msgs left today</span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+                  <span className="text-[11px] text-gray-500 truncate">Online · {limit - usage} msgs left</span>
                 </div>
               </div>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-gray-600 hover:text-white transition-colors w-8 h-8 rounded-xl hover:bg-white/10 flex items-center justify-center">
+            <button onClick={() => setIsOpen(false)} className="text-gray-600 hover:text-white transition-colors w-8 h-8 rounded-xl hover:bg-white/10 flex items-center justify-center flex-shrink-0 ml-2">
               <X size={18} />
             </button>
           </div>
@@ -250,8 +250,8 @@ export default function ChatWidget() {
           {/* Input */}
           <div className="px-4 py-3 flex-shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(0,0,0,0.2)' }}>
             <input type="file" ref={fileInputRef} onChange={handleFileChange} multiple className="hidden" />
-            <div className="flex items-center gap-2">
-              <button onClick={() => fileInputRef.current?.click()} className="text-gray-600 hover:text-gray-400 transition-colors p-1.5 hover:bg-white/5 rounded-lg">
+            <div className="flex items-center gap-2 w-full">
+              <button onClick={() => fileInputRef.current?.click()} className="text-gray-600 hover:text-gray-400 transition-colors p-1.5 hover:bg-white/5 rounded-lg flex-shrink-0">
                 <Paperclip size={16} />
               </button>
               <input
@@ -260,9 +260,9 @@ export default function ChatWidget() {
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-                placeholder={limitReached ? "Limit reached — contact to upgrade" : "Message Astra..."}
+                placeholder={limitReached ? "Limit reached — upgrade" : "Message Astra..."}
                 disabled={isLoading || limitReached}
-                className="flex-1 bg-white/5 border border-white/8 rounded-2xl px-4 py-2.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-amber-400/50 transition-colors disabled:opacity-50"
+                className="flex-1 min-w-0 bg-white/5 border border-white/8 rounded-2xl px-4 py-2.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-amber-400/50 transition-colors disabled:opacity-50"
               />
               <button
                 onClick={handleSend}

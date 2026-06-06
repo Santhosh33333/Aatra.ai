@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router';
 import { useAuth } from '@clerk/clerk-react';
 import Navigation from './sections/Navigation';
 import Hero from './sections/Hero';
@@ -55,6 +55,18 @@ function HomePage() {
 
 export default function App() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isSignedIn, isLoaded } = useAuth();
+
+  // Redirect signed-in users away from auth pages
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      if (location.pathname === '/sign-in' || location.pathname === '/sign-up') {
+        logger.info('[Navigation] User already signed in, redirecting to dashboard', { from: location.pathname });
+        navigate('/dashboard', { replace: true });
+      }
+    }
+  }, [isSignedIn, isLoaded, location.pathname, navigate]);
 
   useEffect(() => {
     logger.info('[Navigation] Route changed', { path: location.pathname });
