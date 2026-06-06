@@ -1,4 +1,4 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 // Instamojo API Configuration
 const INSTAMOJO_API_URL = 'https://www.instamojo.com/api/1.1/';
@@ -15,9 +15,16 @@ interface PaymentRequest {
   purpose: string;
 }
 
+interface ErrorResponse {
+  error: string;
+  required?: string[];
+  details?: unknown;
+  message?: string;
+}
+
 export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
+  req: NextApiRequest,
+  res: NextApiResponse<Record<string, unknown> | ErrorResponse>
 ) {
   // Only allow POST requests
   if (req.method !== 'POST') {
@@ -91,15 +98,15 @@ export default async function handler(
       });
     }
 
-    console.log('[v0] Payment request created successfully:', data.payment_request?.id);
+    console.log('[v0] Payment request created successfully:', (data as Record<string, unknown>).payment_request?.id);
 
     return res.status(200).json({
       success: true,
       mode: 'production',
-      payment_url: data.payment_request?.longurl || data.payment_request?.shorturl,
-      request_id: data.payment_request?.id,
-      amount: data.payment_request?.amount,
-      email: data.payment_request?.email,
+      payment_url: (data as Record<string, Record<string, unknown>>).payment_request?.longurl || (data as Record<string, Record<string, unknown>>).payment_request?.shorturl,
+      request_id: (data as Record<string, Record<string, unknown>>).payment_request?.id,
+      amount: (data as Record<string, Record<string, unknown>>).payment_request?.amount,
+      email: (data as Record<string, Record<string, unknown>>).payment_request?.email,
     });
   } catch (error) {
     console.error('[v0] Error creating payment:', error);
@@ -109,3 +116,4 @@ export default async function handler(
     });
   }
 }
+

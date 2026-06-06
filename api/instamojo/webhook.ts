@@ -1,4 +1,4 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 interface WebhookPayload {
   payment_id: string;
@@ -6,18 +6,23 @@ interface WebhookPayload {
   amount: string;
   buyer_email: string;
   buyer_phone: string;
-  custom_fields?: {
-    plan?: string;
-  };
+  custom_fields?: Record<string, unknown>;
+}
+
+interface WebhookResponse {
+  success: boolean;
+  message?: string;
+  payment_id?: string;
+  error?: string;
 }
 
 export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
+  req: NextApiRequest,
+  res: NextApiResponse<WebhookResponse>
 ) {
   // Only allow POST requests
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
   try {

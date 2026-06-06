@@ -1,4 +1,4 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 const INSTAMOJO_API_URL = 'https://www.instamojo.com/api/1.1/';
 const CLIENT_ID = process.env.VITE_INSTAMOJO_CLIENT_ID || '';
@@ -8,9 +8,15 @@ interface VerifyPaymentRequest {
   paymentId: string;
 }
 
+interface ErrorResponse {
+  error: string;
+  details?: unknown;
+  message?: string;
+}
+
 export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
+  req: NextApiRequest,
+  res: NextApiResponse<Record<string, unknown> | ErrorResponse>
 ) {
   // Only allow POST requests
   if (req.method !== 'POST') {
@@ -60,18 +66,18 @@ export default async function handler(
     }
 
     console.log('[v0] Payment verified:', {
-      id: data.payment?.id,
-      status: data.payment?.status,
-      amount: data.payment?.amount,
+      id: (data as Record<string, Record<string, unknown>>).payment?.id,
+      status: (data as Record<string, Record<string, unknown>>).payment?.status,
+      amount: (data as Record<string, Record<string, unknown>>).payment?.amount,
     });
 
     return res.status(200).json({
       success: true,
       mode: 'production',
-      status: data.payment?.status,
-      payment_id: data.payment?.id,
-      amount: data.payment?.amount,
-      email: data.payment?.buyer_email,
+      status: (data as Record<string, Record<string, unknown>>).payment?.status,
+      payment_id: (data as Record<string, Record<string, unknown>>).payment?.id,
+      amount: (data as Record<string, Record<string, unknown>>).payment?.amount,
+      email: (data as Record<string, Record<string, unknown>>).payment?.buyer_email,
     });
   } catch (error) {
     console.error('[v0] Error verifying payment:', error);
