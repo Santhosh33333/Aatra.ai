@@ -53,12 +53,12 @@ function HomePage() {
   );
 }
 
-export default function App() {
+// Auth redirect component - must be inside Router
+function AuthRedirect() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isSignedIn, isLoaded } = useAuth();
 
-  // Redirect signed-in users away from auth pages
   useEffect(() => {
     if (isLoaded && isSignedIn) {
       if (location.pathname === '/sign-in' || location.pathname === '/sign-up') {
@@ -68,12 +68,20 @@ export default function App() {
     }
   }, [isSignedIn, isLoaded, location.pathname, navigate]);
 
+  return null;
+}
+
+export default function App() {
+  const location = useLocation();
+
   useEffect(() => {
     logger.info('[Navigation] Route changed', { path: location.pathname });
   }, [location.pathname]);
 
   return (
-    <Routes>
+    <>
+      <AuthRedirect />
+      <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/sign-in" element={
         <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
@@ -113,6 +121,7 @@ export default function App() {
         </Suspense>
       } />
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      </Routes>
+    </>
   );
 }
