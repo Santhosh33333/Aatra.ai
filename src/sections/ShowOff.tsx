@@ -15,7 +15,12 @@ function ShowOff() {
   const sectionRef = useRef<HTMLElement>(null);
   const phoneRef = useRef<HTMLDivElement>(null);
   const [showLogs, setShowLogs] = useState(true);
-  const [logs, setLogs] = useState<string[]>([]);
+  const [logs, setLogs] = useState<string[]>([
+    '[09:15:32] [ShowOff] Component mounted',
+    '[09:15:32] [ShowOff] Animation triggered',
+    '[09:15:33] [ShowOff] Chat interface rendered',
+    '[09:15:33] [ShowOff] Logs initialized',
+  ]);
 
   useEffect(() => {
     // Log when ShowOff section loads
@@ -61,15 +66,15 @@ function ShowOff() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-24 md:py-32 bg-gradient-to-b from-navy to-navy-deep overflow-hidden"
+      className="relative w-full py-16 md:py-24 bg-gradient-to-b from-navy to-navy-deep overflow-visible"
     >
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #00c8ff, transparent)' }} />
 
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start">
           {/* Left: Phone Mock */}
-          <div ref={phoneRef} className="relative opacity-0 flex justify-center">
-            <div className="w-[260px] h-[480px] bg-navy-dark rounded-[40px] border border-white/10 overflow-hidden shadow-lg">
+          <div ref={phoneRef} className="relative opacity-0 flex justify-center lg:justify-start">
+            <div className="w-[260px] h-[480px] bg-navy-dark rounded-[40px] border border-white/10 overflow-hidden shadow-lg flex-shrink-0">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-6 bg-navy rounded-b-[16px] z-10" />
               <div className="h-[48px] bg-navy-dark border-b border-white/5 flex items-center px-4 gap-2 mt-1">
                 <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber to-cyan" />
@@ -93,54 +98,52 @@ function ShowOff() {
             </div>
           </div>
 
-          {/* Right: Content */}
-          <div className="space-y-6">
+          {/* Right: Content - Data & Logs */}
+          <div className="space-y-5">
             <div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Smart Conversations</h3>
-              <p className="text-gray-400 mb-4">AI that understands context and emotions in real-time</p>
-              <div className="space-y-3">
-                <div>
-                  <div className="text-3xl font-bold bg-gradient-to-r from-amber-400 to-cyan-400 bg-clip-text text-transparent">10M+</div>
-                  <div className="text-sm text-gray-400">Active Users</div>
-                </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Smart Conversations</h2>
+              <p className="text-gray-400 text-lg mb-4">AI that understands context and emotions in real-time</p>
+              <div className="inline-block">
+                <div className="text-4xl font-bold bg-gradient-to-r from-amber-400 to-cyan-400 bg-clip-text text-transparent">10M+</div>
+                <div className="text-sm text-gray-500">Active Users</div>
               </div>
             </div>
 
-            {/* Stats */}
+            {/* Performance Stats */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
-                <div className="text-sm text-gray-400 mb-1">Response Time</div>
+              <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                <div className="text-xs text-gray-400 mb-1">Response Time</div>
                 <div className="text-xl font-bold text-green-400">45ms</div>
-                <div className="text-xs text-gray-500">Optimal</div>
+                <div className="text-xs text-green-600">Optimal</div>
               </div>
-              <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
-                <div className="text-sm text-gray-400 mb-1">Accuracy</div>
+              <div className="p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+                <div className="text-xs text-gray-400 mb-1">Accuracy</div>
                 <div className="text-xl font-bold text-cyan-400">99.8%</div>
-                <div className="text-xs text-gray-500">Excellent</div>
+                <div className="text-xs text-cyan-600">Excellent</div>
               </div>
             </div>
 
-            {/* Log Viewer Toggle */}
+            {/* Logs Toggle Button */}
             <button
               onClick={() => {
                 setShowLogs(!showLogs);
                 logger.info(`[ShowOff] Log viewer ${!showLogs ? 'opened' : 'closed'}`);
                 addLog(`[ShowOff] Log viewer toggled`);
               }}
-              className="w-full px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 rounded-lg border border-amber-500/30 text-sm font-medium transition-colors"
+              className="w-full px-4 py-2.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 rounded-lg border border-amber-500/40 text-sm font-medium transition-colors"
             >
-              {showLogs ? '▼ Hide Logs' : '▶ Show Logs'} ({logs.length})
+              {showLogs ? '▼ Hide Activity Logs' : '▶ Show Activity Logs'} ({logs.length})
             </button>
 
-            {/* Log Viewer */}
+            {/* Activity Logs Display */}
             {showLogs && (
-              <div className="p-4 bg-black/40 border border-white/10 rounded-lg max-h-48 overflow-y-auto font-mono text-xs space-y-1">
-                <div className="text-gray-500 mb-2">Activity Logs:</div>
+              <div className="p-4 bg-black/60 border border-amber-500/20 rounded-lg max-h-56 overflow-y-auto font-mono text-xs space-y-1">
+                <div className="text-amber-400 font-semibold mb-2 sticky top-0 bg-black/60">📋 Real-time Activity Logs:</div>
                 {logs.length === 0 ? (
-                  <div className="text-gray-600">Waiting for activity...</div>
+                  <div className="text-gray-500 italic">Waiting for activity...</div>
                 ) : (
                   logs.map((log, idx) => (
-                    <div key={idx} className="text-gray-400 hover:text-green-400 transition-colors">
+                    <div key={idx} className="text-gray-300 hover:text-amber-300 transition-colors pl-2 border-l border-amber-500/20">
                       {log}
                     </div>
                   ))
