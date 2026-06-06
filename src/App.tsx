@@ -18,6 +18,7 @@ const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const AdminGateways = lazy(() => import('./pages/admin-gateways'));
 const SignInPage = lazy(() => import('./pages/SignInPage'));
 const SignUpPage = lazy(() => import('./pages/SignUpPage'));
+const OTPVerificationPage = lazy(() => import('./pages/OTPVerificationPage'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const Contact = lazy(() => import('./pages/Contact'));
@@ -71,6 +72,11 @@ export default function App() {
       <Route path="/sign-up" element={
         <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
           <SignUpPage />
+        </Suspense>
+      } />
+      <Route path="/verify-otp" element={
+        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
+          <OTPVerificationPage />
         </Suspense>
       } />
       <Route path="/dashboard" element={
