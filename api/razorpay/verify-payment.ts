@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { createHmac } from 'crypto';
 
 interface VerifyPaymentRequest {
   orderId: string;
@@ -45,12 +46,8 @@ export default async function handler(
     }
 
     // Production: Verify with HMAC SHA256
-    const crypto = require('crypto');
     const body = `${orderId}|${paymentId}`;
-    const expectedSignature = crypto
-      .createHmac('sha256', KEY_SECRET)
-      .update(body)
-      .digest('hex');
+    const expectedSignature = createHmac('sha256', KEY_SECRET).update(body).digest('hex');
 
     if (expectedSignature === signature) {
       console.log('[v0] Razorpay: Payment verified successfully');

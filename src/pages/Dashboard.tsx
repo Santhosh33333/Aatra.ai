@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { useEffect } from 'react';
 import { loadSettings, getUsageToday } from '../lib/adminStore';
 import { logger } from '../lib/logger';
+import ChatWidget from '../sections/ChatWidget';
 import {
   MessageCircle, Sparkles, LogOut, Settings, Crown,
   TrendingUp, Zap, User, ChevronRight, Mail, Star, Lock
@@ -13,221 +14,196 @@ export default function Dashboard() {
   const { signOut } = useClerk();
   const settings = loadSettings();
   const usage = getUsageToday();
-  const limit = settings.dailyFreeLimit || 20;
+  const limit = settings.dailyFreeLimit || 30;
   const usagePercent = Math.min((usage / limit) * 100, 100);
-
   const firstName = user?.firstName || user?.emailAddresses[0]?.emailAddress?.split('@')[0] || 'there';
-
   const freeModels = settings.models.filter(m => m.tier === 'free');
 
-  // Log dashboard initialization
   useEffect(() => {
-    logger.info('[Dashboard] User dashboard loaded', {
-      user: user?.fullName || user?.emailAddresses[0]?.emailAddress,
-      usage: `${usage}/${limit}`,
-      models: freeModels.length,
-    });
-  }, [user, usage, limit, freeModels.length]);
+    logger.info('[Dashboard] Loaded', { user: user?.fullName, usage: `${usage}/${limit}` });
+  }, [user, usage, limit]);
 
   return (
-    <div className="min-h-screen bg-[#080c18] text-white">
+    <div className="min-h-screen text-white" style={{ background: '#0a0612' }}>
       {/* Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-60 -right-60 w-[700px] h-[700px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(255,179,64,0.05) 0%, transparent 70%)' }} />
-        <div className="absolute -bottom-60 -left-60 w-[600px] h-[600px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(0,200,255,0.05) 0%, transparent 70%)' }} />
+        <div className="absolute -top-60 -right-60 w-[600px] h-[600px] rounded-full opacity-10"
+          style={{ background: 'radial-gradient(circle,#7c3aed,transparent 70%)' }} />
+        <div className="absolute -bottom-60 -left-60 w-[500px] h-[500px] rounded-full opacity-10"
+          style={{ background: 'radial-gradient(circle,#10b981,transparent 70%)' }} />
       </div>
 
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-64 bg-white/[0.03] border-r border-white/8 flex flex-col z-20 hidden lg:flex">
+      <div className="fixed left-0 top-0 h-full w-64 flex-col z-20 hidden lg:flex"
+        style={{ background: 'rgba(255,255,255,0.02)', borderRight: '1px solid rgba(124,58,237,0.15)' }}>
         {/* Logo */}
-        <div className="px-6 py-5 border-b border-white/8">
+        <div className="px-6 py-5" style={{ borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-cyan-400 flex items-center justify-center shadow-lg">
-              <Sparkles size={14} className="text-[#080c18]" />
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#10b981)' }}>
+              <Sparkles size={14} className="text-white" />
             </div>
-            <span className="font-semibold text-white">Astra AI</span>
+            <div className="flex flex-col leading-none">
+              <span className="font-bold text-white text-sm">Aatra</span>
+              <span className="text-[9px] font-semibold" style={{ color: '#7c3aed' }}>AI</span>
+            </div>
           </Link>
         </div>
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1">
           {[
-            { icon: MessageCircle, label: 'Chat', active: true, href: '#' },
-            { icon: TrendingUp, label: 'Usage', active: false, href: '#' },
-            { icon: User, label: 'Profile', active: false, href: '#' },
-            { icon: Settings, label: 'Settings', active: false, href: '#' },
+            { icon: MessageCircle, label: 'Chat', active: true },
+            { icon: TrendingUp, label: 'Usage', active: false },
+            { icon: User, label: 'Profile', active: false },
+            { icon: Settings, label: 'Settings', active: false },
           ].map(item => (
             <button key={item.label}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                item.active
-                  ? 'bg-amber-400/12 text-amber-400 border border-amber-400/15'
-                  : 'text-gray-500 hover:text-white hover:bg-white/5'
-              }`}>
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
+              style={item.active
+                ? { background: 'rgba(124,58,237,0.15)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.25)' }
+                : { color: '#6b7280' }}>
               <item.icon size={16} />
               {item.label}
             </button>
           ))}
-          
-          {/* Separator */}
-          <div className="my-2 border-t border-white/8" />
-          
-          {/* Admin Section */}
-          <div className="text-xs text-gray-600 px-3 py-2 font-semibold uppercase tracking-wider">Admin</div>
-          <Link to="/admin"
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-white hover:bg-white/5 transition-all group">
-            <Lock size={16} />
-            <span>Admin Panel</span>
-            <ChevronRight size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-          </Link>
-          <Link to="/admin-gateways"
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-white hover:bg-white/5 transition-all group">
-            <Zap size={16} />
-            <span>Payment Gateways</span>
-            <ChevronRight size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-          </Link>
+
+          <div className="my-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+          <div className="text-xs px-3 py-2 font-semibold uppercase tracking-wider" style={{ color: '#4b5563' }}>Admin</div>
+          {[
+            { icon: Lock, label: 'Admin Panel', to: '/admin' },
+            { icon: Zap, label: 'Payment Gateways', to: '/admin-gateways' },
+          ].map(item => (
+            <Link key={item.label} to={item.to}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group"
+              style={{ color: '#6b7280' }}>
+              <item.icon size={16} />
+              <span>{item.label}</span>
+              <ChevronRight size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Link>
+          ))}
         </nav>
 
-        {/* Usage card in sidebar */}
+        {/* Usage card */}
         <div className="px-3 pb-3">
-          <div className="bg-white/5 border border-white/8 rounded-xl p-3">
+          <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,58,237,0.15)' }}>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-gray-500">Daily Usage</span>
+              <span className="text-xs" style={{ color: '#6b7280' }}>Daily Usage</span>
               <span className="text-xs font-medium text-white">{usage}/{limit}</span>
             </div>
-            <div className="w-full h-1.5 bg-white/8 rounded-full overflow-hidden mb-2">
+            <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
               <div className="h-full rounded-full transition-all duration-500"
-                style={{
-                  width: `${usagePercent}%`,
-                  background: usagePercent >= 80
-                    ? 'linear-gradient(90deg,#f87171,#ef4444)'
-                    : 'linear-gradient(90deg,#ffb340,#00c8ff)'
-                }} />
+                style={{ width: `${usagePercent}%`, background: usagePercent >= 80 ? 'linear-gradient(90deg,#f87171,#ef4444)' : 'linear-gradient(90deg,#7c3aed,#10b981)' }} />
             </div>
             {usagePercent >= 80 && (
               <a href={`mailto:${settings.contactEmail}?subject=Upgrade Request`}
-                className="flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 transition-colors">
+                className="flex items-center gap-1.5 text-xs mt-2 transition-colors"
+                style={{ color: '#a78bfa' }}>
                 <Crown size={11} /> Upgrade for unlimited
               </a>
             )}
           </div>
         </div>
 
-        {/* User + Signout */}
-        <div className="px-3 pb-4 border-t border-white/8 pt-3">
+        {/* User */}
+        <div className="px-3 pb-4 pt-3" style={{ borderTop: '1px solid rgba(124,58,237,0.15)' }}>
           <div className="flex items-center gap-3 px-2 py-2 rounded-xl">
-            <img 
-              src={user?.imageUrl || ''} 
-              alt="User profile" 
-              className="w-8 h-8 rounded-full object-cover ring-2 ring-white/10" 
-              onError={(e) => {
-                const img = e.target as HTMLImageElement;
-                if (img.src && !img.src.includes('data:image')) {
-                  logger.warn('[Dashboard] User avatar image failed to load, using fallback SVG', { originalSrc: img.src });
-                }
-                img.src = `data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2216%22 fill=%22%2388a5d8%22/%3E%3C/svg%3E`;
-              }}
-              onLoad={() => {
-                logger.debug('[Dashboard] User avatar loaded successfully');
-              }}
-              loading="lazy"
-            />
+            <img src={user?.imageUrl || ''}
+              className="w-8 h-8 rounded-full object-cover ring-2"
+              style={{ '--tw-ring-color': 'rgba(124,58,237,0.3)' } as React.CSSProperties}
+              onError={e => { (e.target as HTMLImageElement).src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%237c3aed'/%3E%3C/svg%3E`; }}
+              alt="Avatar" />
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-white truncate">{user?.fullName || firstName}</p>
-              <p className="text-[10px] text-gray-600 truncate">{user?.emailAddresses[0]?.emailAddress}</p>
+              <p className="text-[10px] truncate" style={{ color: '#4b5563' }}>{user?.emailAddresses[0]?.emailAddress}</p>
             </div>
             <button onClick={() => signOut({ redirectUrl: '/' })}
-              className="text-gray-600 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5">
+              className="p-1 rounded-lg transition-colors hover:bg-white/5"
+              style={{ color: '#4b5563' }}>
               <LogOut size={14} />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Main content */}
+      {/* Main */}
       <div className="lg:pl-64 min-h-screen">
-        {/* Top bar (mobile) */}
-        <div className="lg:hidden flex items-center justify-between px-5 py-4 border-b border-white/8 bg-white/[0.02]">
+        {/* Mobile topbar */}
+        <div className="lg:hidden flex items-center justify-between px-5 py-4"
+          style={{ borderBottom: '1px solid rgba(124,58,237,0.15)', background: 'rgba(255,255,255,0.02)' }}>
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-cyan-400 flex items-center justify-center">
-              <Sparkles size={12} className="text-[#080c18]" />
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#10b981)' }}>
+              <Sparkles size={12} className="text-white" />
             </div>
-            <span className="font-semibold text-sm">Astra AI</span>
+            <span className="font-semibold text-sm">Aatra AI</span>
           </Link>
-          <button onClick={() => signOut({ redirectUrl: '/' })}
-            className="text-gray-500 hover:text-white transition-colors">
+          <button onClick={() => signOut({ redirectUrl: '/' })} style={{ color: '#6b7280' }}>
             <LogOut size={18} />
           </button>
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto px-5 lg:px-8 py-8">
-          {/* Welcome header */}
+          {/* Welcome */}
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs text-amber-400 font-medium">👋 Welcome back</span>
+              <span className="text-xs font-medium" style={{ color: '#a78bfa' }}>👋 Welcome back</span>
             </div>
             <h1 className="text-2xl lg:text-3xl font-bold text-white">Hey, {firstName}!</h1>
-            <p className="text-gray-500 text-sm mt-1">Here's what you can do with Astra today.</p>
+            <p className="text-sm mt-1" style={{ color: '#6b7280' }}>
+              Your Aatra AI dashboard — powered by Gemini 2.0 Flash.
+            </p>
           </div>
 
-          {/* Stats row */}
+          {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
             {[
-              { label: 'Messages Today', value: usage, icon: MessageCircle, color: 'amber' },
-              { label: 'Daily Limit', value: limit, icon: Zap, color: 'cyan' },
-              { label: 'Remaining', value: Math.max(0, limit - usage), icon: TrendingUp, color: 'green' },
-              { label: 'Free Models', value: freeModels.length, icon: Star, color: 'purple' },
+              { label: 'Messages Today', value: usage, icon: MessageCircle, color: '#7c3aed', bg: 'rgba(124,58,237,0.15)' },
+              { label: 'Daily Limit', value: limit, icon: Zap, color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
+              { label: 'Remaining', value: Math.max(0, limit - usage), icon: TrendingUp, color: '#34d399', bg: 'rgba(52,211,153,0.15)' },
+              { label: 'Free Models', value: freeModels.length, icon: Star, color: '#a78bfa', bg: 'rgba(167,139,250,0.15)' },
             ].map((stat, i) => (
-              <div key={i} className="bg-white/[0.04] border border-white/8 rounded-2xl p-4">
-                <div className={`w-8 h-8 rounded-xl mb-3 flex items-center justify-center ${
-                  stat.color === 'amber' ? 'bg-amber-400/15' :
-                  stat.color === 'cyan' ? 'bg-cyan-400/15' :
-                  stat.color === 'green' ? 'bg-emerald-400/15' : 'bg-purple-400/15'
-                }`}>
-                  <stat.icon size={15} className={
-                    stat.color === 'amber' ? 'text-amber-400' :
-                    stat.color === 'cyan' ? 'text-cyan-400' :
-                    stat.color === 'green' ? 'text-emerald-400' : 'text-purple-400'
-                  } />
+              <div key={i} className="rounded-2xl p-4"
+                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="w-8 h-8 rounded-xl mb-3 flex items-center justify-center" style={{ background: stat.bg }}>
+                  <stat.icon size={15} style={{ color: stat.color }} />
                 </div>
                 <p className="text-2xl font-bold text-white">{stat.value}</p>
-                <p className="text-xs text-gray-600 mt-0.5">{stat.label}</p>
+                <p className="text-xs mt-0.5" style={{ color: '#4b5563' }}>{stat.label}</p>
               </div>
             ))}
           </div>
 
-          {/* Available models */}
+          {/* Models */}
           <div className="mb-8">
-            <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Your Models</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: '#6b7280' }}>Your Models</h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
               {settings.models.map((model, i) => {
                 const isFree = model.tier === 'free';
                 return (
-                  <div key={i} className={`relative bg-white/[0.04] border rounded-2xl p-4 transition-all ${
-                    isFree ? 'border-white/8 hover:border-white/15' : 'border-white/5 opacity-60'
-                  }`}>
-                    {!isFree && (
-                      <div className="absolute top-3 right-3">
-                        <Crown size={14} className="text-amber-400" />
-                      </div>
-                    )}
+                  <div key={i} className={`relative rounded-2xl p-4 transition-all ${!isFree ? 'opacity-60' : ''}`}
+                    style={{ background: 'rgba(255,255,255,0.03)', border: isFree ? '1px solid rgba(16,185,129,0.25)' : '1px solid rgba(255,255,255,0.05)' }}>
+                    {!isFree && <div className="absolute top-3 right-3"><Crown size={14} style={{ color: '#f59e0b' }} /></div>}
                     <div className="flex items-center gap-2 mb-2">
-                      <div className={`w-2 h-2 rounded-full ${isFree ? 'bg-emerald-400' : 'bg-gray-600'}`} />
+                      <div className="w-2 h-2 rounded-full" style={{ background: isFree ? '#10b981' : '#374151' }} />
                       <span className="text-sm font-semibold text-white">{model.name}</span>
                     </div>
-                    <p className="text-xs text-gray-500 mb-3">{model.description}</p>
+                    <p className="text-xs mb-3" style={{ color: '#6b7280' }}>{model.description}</p>
                     <div className="flex items-center justify-between">
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                        model.tier === 'free' ? 'bg-emerald-500/15 text-emerald-400' :
-                        model.tier === 'pro' ? 'bg-amber-500/15 text-amber-400' :
-                        'bg-purple-500/15 text-purple-400'
-                      }`}>{model.tier.toUpperCase()}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                        style={model.tier === 'free'
+                          ? { background: 'rgba(16,185,129,0.15)', color: '#10b981' }
+                          : model.tier === 'pro'
+                          ? { background: 'rgba(124,58,237,0.15)', color: '#a78bfa' }
+                          : { background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
+                        {model.tier.toUpperCase()}
+                      </span>
                       {isFree ? (
-                        <span className="text-xs text-emerald-400 font-medium">Active</span>
+                        <span className="text-xs font-medium" style={{ color: '#10b981' }}>Active</span>
                       ) : (
                         <a href={`mailto:${settings.contactEmail}?subject=Upgrade to ${model.name}`}
-                          className="text-xs text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
+                          className="text-xs flex items-center gap-1 transition-colors"
+                          style={{ color: '#a78bfa' }}>
                           Unlock <ChevronRight size={10} />
                         </a>
                       )}
@@ -238,52 +214,55 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Upgrade CTA if nearing limit */}
+          {/* Upgrade CTA */}
           {usagePercent >= 60 && (
-            <div className="relative overflow-hidden rounded-2xl border border-amber-400/20 bg-gradient-to-r from-amber-400/8 to-cyan-400/8 p-5 mb-8">
+            <div className="relative overflow-hidden rounded-2xl p-5 mb-8"
+              style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.1),rgba(16,185,129,0.08))', border: '1px solid rgba(124,58,237,0.25)' }}>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <Crown size={16} className="text-amber-400" />
+                    <Crown size={16} style={{ color: '#a78bfa' }} />
                     <span className="text-sm font-semibold text-white">
                       {usagePercent >= 100 ? 'Daily limit reached' : 'Nearing your limit'}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 mb-3">
-                    {settings.upgradeMessage || 'Contact us to unlock unlimited messages and premium models.'}
+                  <p className="text-xs mb-3" style={{ color: '#6b7280' }}>
+                    {settings.upgradeMessage}
                   </p>
-                  <a
-                    href={`mailto:${settings.contactEmail}?subject=Upgrade Request - ${user?.emailAddresses[0]?.emailAddress}`}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-cyan-400 text-[#080c18] text-xs font-semibold rounded-xl hover:opacity-90 transition-opacity"
-                  >
-                    <Mail size={12} /> Contact to Upgrade
+                  <a href={`mailto:${settings.contactEmail}?subject=Upgrade Request`}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                    style={{ background: 'linear-gradient(135deg,#7c3aed,#10b981)' }}>
+                    <Mail size={12} /> Upgrade Now
                   </a>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <span className="text-3xl font-bold text-white">{Math.round(usagePercent)}%</span>
-                  <p className="text-[10px] text-gray-600">used</p>
+                  <p className="text-[10px]" style={{ color: '#4b5563' }}>used</p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Quick start chat button */}
-          <div className="bg-white/[0.04] border border-white/8 rounded-2xl p-6 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-cyan-400 flex items-center justify-center mx-auto mb-4">
-              <MessageCircle size={22} className="text-[#080c18]" />
+          {/* Start chatting CTA */}
+          <div className="rounded-2xl p-6 text-center"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(124,58,237,0.15)' }}>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#10b981)' }}>
+              <MessageCircle size={22} className="text-white" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Ready to chat?</h3>
-            <p className="text-sm text-gray-500 mb-5">Click the chat button in the bottom-right corner to start a conversation with Astra AI.</p>
-            <div className="flex items-center justify-center gap-2 text-xs text-gray-600">
+            <p className="text-sm mb-5" style={{ color: '#6b7280' }}>
+              Click the chat button in the corner to start a conversation with Aatra AI.
+            </p>
+            <div className="flex items-center justify-center gap-2 text-xs" style={{ color: '#4b5563' }}>
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Astra is online and ready
+              Aatra is online — Gemini 2.0 Flash ready
             </div>
           </div>
         </div>
       </div>
 
-      {/* Chat widget available on dashboard too */}
-      {/* Import and render ChatWidget here if needed */}
+      <ChatWidget />
     </div>
   );
 }

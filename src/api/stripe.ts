@@ -71,7 +71,12 @@ export async function createCheckoutSession(priceId: string, email: string, cust
 }
 
 // Webhook handler for payment confirmations
-export async function handlePaymentWebhook(event: any) {
+export interface StripeWebhookEvent {
+  type: string
+  data: { object: Record<string, unknown> }
+}
+
+export async function handlePaymentWebhook(event: StripeWebhookEvent) {
   switch (event.type) {
     case 'payment_intent.succeeded':
       console.log('[v0] Payment succeeded:', event.data.object);

@@ -8,7 +8,9 @@ export const loadSettings = (): AdminSettings => {
     if (stored) {
       return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
     }
-  } catch {}
+  } catch (error) {
+    console.warn('[adminStore] Failed to load settings', error);
+  }
   return { ...DEFAULT_SETTINGS };
 };
 
@@ -17,7 +19,9 @@ export const saveSettings = (settings: AdminSettings): void => {
     // Never store password in settings
     const { ...safe } = settings;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
-  } catch {}
+  } catch (error) {
+    console.warn('[adminStore] Failed to save settings', error);
+  }
 };
 
 // Usage tracker
@@ -36,7 +40,9 @@ export const getUsageToday = (): number => {
       const today = new Date().toDateString();
       if (record.date === today) return record.count;
     }
-  } catch {}
+  } catch (error) {
+    console.warn('[adminStore] Failed to read usage', error);
+  }
   return 0;
 };
 

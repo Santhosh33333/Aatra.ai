@@ -63,7 +63,7 @@ export default async function handler(
       amount: amount, // In paise
       currency: currency || 'INR',
       receipt: `receipt_${Date.now()}`,
-      description: description || `Astra AI ${planId}`,
+      description: purpose || description || `Astra AI ${planId}`,
       customer_notify: 1,
       notes: {
         planId,

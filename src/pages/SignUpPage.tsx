@@ -12,14 +12,13 @@ const perks = [
 ];
 
 export default function SignUpPage() {
-  const [logs, setLogs] = useState<string[]>([
+  const [logs, setLogs] = useState<string[]>(() => [
     `[${new Date().toLocaleTimeString()}] [SignUp] Page loaded`,
+    `[${new Date().toLocaleTimeString()}] [SignUp] Form component initialized`,
   ]);
 
   useEffect(() => {
     logger.info('[SignUp] Signup page mounted');
-    const timestamp = new Date().toLocaleTimeString();
-    setLogs(prev => [...prev, `[${timestamp}] [SignUp] Form component initialized`]);
     const addLogTimer = setTimeout(() => {
       setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] [SignUp] Signup form ready`]);
     }, 500);
@@ -107,7 +106,7 @@ export default function SignUpPage() {
               routing="path"
               path="/sign-up"
               signInUrl="/sign-in"
-              afterSignUpUrl="/dashboard"
+              forceRedirectUrl="/dashboard"
               appearance={{
                 layout: {
                   socialButtonsPlacement: 'top',

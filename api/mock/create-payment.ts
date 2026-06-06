@@ -24,7 +24,7 @@ export default async function handler(
   }
 
   try {
-    const { planId, email, phone, amount, currency, description, purpose } = req.body as PaymentRequest;
+    const { planId, email, phone, amount } = req.body as PaymentRequest;
 
     if (!email || !phone || !amount || !planId) {
       return res.status(400).json({

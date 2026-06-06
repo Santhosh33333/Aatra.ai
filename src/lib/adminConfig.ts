@@ -1,35 +1,35 @@
-// Admin configuration - credentials stored via closure, never rendered to DOM
-const getAdminCredentials = (() => {
-  const credentials = {
-    email: 'santhoshkrishna958@gmail.com',
-    // Password hash approach - compare against stored hash
-    passwordHash: btoa('300703S#s'), // base64 encoded, swap for bcrypt in production
-  };
-  return () => credentials;
-})();
+// Admin configuration
+// Password stored as SHA-256 hex (not reversible). Current password: 300703S#s
+const ADMIN_EMAIL = 'santhoshkrishna958@gmail.com';
+const ADMIN_PASSWORD_HASH = '3beb818968fa53e9e9c14432c9ff40cdb15d0479c0f7fb44b9e7c2e2e44f2259';
 
-export const verifyAdmin = (email: string, password: string): boolean => {
-  const creds = getAdminCredentials();
-  return email === creds.email && btoa(password) === creds.passwordHash;
+async function sha256hex(str: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+export const verifyAdmin = async (email: string, password: string): Promise<boolean> => {
+  if (email !== ADMIN_EMAIL) return false;
+  return (await sha256hex(password)) === ADMIN_PASSWORD_HASH;
 };
 
-// Default settings - admin can override these from the panel
 export const DEFAULT_SETTINGS = {
-  siteName: 'Astra AI',
-  tagline: "It's not just chat, it's a connection",
-  primaryColor: '#ffb340',
-  accentColor: '#00c8ff',
-  dailyFreeLimit: 20,
+  siteName: 'Aatra AI',
+  tagline: 'Think Smarter. Chat Faster. For Free.',
+  primaryColor: '#7c3aed',
+  accentColor: '#10b981',
+  dailyFreeLimit: 30,
   models: [
-    { id: 'gpt-4o-mini', name: 'Astra Mini', tier: 'free', description: 'Fast & efficient' },
-    { id: 'gpt-4o', name: 'Astra Pro', tier: 'pro', description: 'Smarter responses' },
-    { id: 'gpt-4-turbo', name: 'Astra Ultra', tier: 'ultra', description: 'Most powerful' },
+    { id: 'gemini-2.0-flash', name: 'Aatra Flash', tier: 'free', description: 'Gemini 2.0 Flash — completely free' },
+    { id: 'gemini-1.5-pro', name: 'Aatra Pro', tier: 'pro', description: 'Gemini 1.5 Pro — advanced reasoning' },
+    { id: 'gemini-1.5-ultra', name: 'Aatra Ultra', tier: 'ultra', description: 'Gemini Ultra — maximum intelligence' },
   ],
   contactEmail: 'santhoshkrishna958@gmail.com',
-  upgradeMessage: 'You\'ve reached your daily limit! Contact us to unlock unlimited access.',
+  upgradeMessage: "You've used your 30 free messages today! Upgrade for unlimited access.",
 };
 
 export type AdminSettings = typeof DEFAULT_SETTINGS & {
   apiKey?: string;
+  geminiApiKey?: string;
   theme?: 'dark' | 'light' | 'midnight' | 'forest';
 };

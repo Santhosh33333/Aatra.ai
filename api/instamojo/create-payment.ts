@@ -32,7 +32,7 @@ export default async function handler(
   }
 
   try {
-    const { planId, email, phone, amount, currency, description, purpose } = req.body as PaymentRequest;
+    const { planId, email, phone, amount, purpose } = req.body as PaymentRequest;
 
     // Validate required fields
     if (!email || !phone || !amount || !planId) {

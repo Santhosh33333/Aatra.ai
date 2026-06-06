@@ -110,18 +110,14 @@ export default function Features() {
       id="features"
       className="relative w-full bg-gradient-to-b from-navy-deep to-navy overflow-hidden"
     >
-      {/* Section Header */}
-      <div
-        ref={headerRef}
-        className="text-center pt-20 md:pt-32 pb-12 px-6"
-      >
-        <div className="text-xs font-medium text-gray-muted uppercase tracking-[3px] mb-4 opacity-0">
+        <div ref={headerRef} className="text-center pt-20 md:pt-32 pb-12 px-6">
+        <div className="text-xs font-medium text-gray-muted uppercase tracking-[3px] mb-4">
           FEATURES
         </div>
-        <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 opacity-0">
+        <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
           Everything you need
         </h2>
-        <p className="text-lg text-gray-muted opacity-0">
+        <p className="text-lg text-gray-muted">
           Powerful features designed for natural conversation
         </p>
       </div>
@@ -136,7 +132,7 @@ export default function Features() {
           {features.map((feature, i) => (
             <div
               key={i}
-              className="feature-card w-[300px] md:w-[340px] h-[380px] md:h-[420px] flex flex-col"
+              className="feature-card w-[300px] md:w-[340px] min-h-[320px] flex flex-col"
             >
               {/* Icon */}
               <div

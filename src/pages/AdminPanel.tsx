@@ -5,6 +5,15 @@ import type { AdminSettings } from '../lib/adminConfig';
 import { logger } from '../lib/logger';
 import { Eye, EyeOff, Plus, Trash2, Save, LogOut, Settings, Palette, Key, Cpu, Mail, Image, X } from 'lucide-react';
 
+type ModelTier = 'free' | 'pro' | 'ultra';
+
+type NewModelState = {
+  id: string;
+  name: string;
+  tier: ModelTier;
+  description: string;
+};
+
 export default function AdminPanel() {
   const [authed, setAuthed] = useState(false);
   const [email, setEmail] = useState('');
@@ -14,12 +23,12 @@ export default function AdminPanel() {
   const [settings, setSettings] = useState<AdminSettings>(loadSettings());
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'api' | 'models' | 'theme' | 'contact'>('general');
-  const [newModel, setNewModel] = useState({ id: '', name: '', tier: 'pro' as 'free'|'pro'|'ultra', description: '' });
+  const [newModel, setNewModel] = useState<NewModelState>({ id: '', name: '', tier: 'pro', description: '' });
   const [logoPreview, setLogoPreview] = useState<string>(localStorage.getItem('admin_logo') || '');
   const [dragActive, setDragActive] = useState(false);
 
-  const handleLogin = () => {
-    if (verifyAdmin(email, password)) {
+  const handleLogin = async () => {
+    if (await verifyAdmin(email, password)) {
       setAuthed(true);
       setLoginError('');
       logger.success('[AdminPanel] Admin logged in successfully');
@@ -329,7 +338,7 @@ export default function AdminPanel() {
                   />
                   <select
                     value={newModel.tier}
-                    onChange={e => setNewModel(p => ({ ...p, tier: e.target.value as any }))}
+                    onChange={e => setNewModel(p => ({ ...p, tier: e.target.value as ModelTier }))}
                     className="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-400 transition-colors"
                   >
                     <option value="free">Free Tier</option>

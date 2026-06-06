@@ -25,7 +25,9 @@ function ShowOff() {
   useEffect(() => {
     // Log when ShowOff section loads
     logger.info('[ShowOff] Component mounted - Astra showcase loading');
-    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] [ShowOff] Component mounted`]);
+    queueMicrotask(() => {
+      setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] [ShowOff] Component mounted`]);
+    });
     
     const ctx = gsap.context(() => {
       logger.debug('[ShowOff] Animating phone element');
@@ -60,7 +62,9 @@ function ShowOff() {
 
   useEffect(() => {
     logger.success('[ShowOff] Chat messages loaded');
-    addLog('[ShowOff] Chat interface rendered');
+    queueMicrotask(() => {
+      addLog('[ShowOff] Chat interface rendered');
+    });
   }, []);
 
   return (

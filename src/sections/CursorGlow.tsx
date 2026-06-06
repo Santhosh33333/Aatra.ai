@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, memo } from 'react';
 
 function CursorGlow() {
   const glowRef = useRef<HTMLDivElement>(null);
-  const [isTouch, setIsTouch] = useState(false);
+  const [isTouch] = useState(() => typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches);
   const mousePos = useRef({ x: -500, y: -500 });
   const currentPos = useRef({ x: -500, y: -500 });
   const rafId = useRef<number>(0);
@@ -10,7 +10,6 @@ function CursorGlow() {
 
   useEffect(() => {
     const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
-    setIsTouch(isTouchDevice);
     if (isTouchDevice) return;
 
     const handleMouseMove = (e: MouseEvent) => {

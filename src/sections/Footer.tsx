@@ -8,19 +8,39 @@ gsap.registerPlugin(ScrollTrigger);
 const linkColumns = [
   {
     title: 'Product',
-    links: ['Features', 'Pricing', 'API', 'Integrations'],
+    links: [
+      { label: 'Features', href: '/#features' },
+      { label: 'Pricing', href: '/#pricing' },
+      { label: 'API', href: '/contact' },
+      { label: 'Integrations', href: '/contact' },
+    ],
   },
   {
     title: 'Company',
-    links: ['About', 'Blog', 'Careers', 'Press'],
+    links: [
+      { label: 'About', href: '/contact' },
+      { label: 'Blog', href: '/contact' },
+      { label: 'Careers', href: '/contact' },
+      { label: 'Press', href: '/contact' },
+    ],
   },
   {
     title: 'Resources',
-    links: ['Documentation', 'Help Center', 'Community', 'Contact'],
+    links: [
+      { label: 'Documentation', href: '/contact' },
+      { label: 'Help Center', href: '/contact' },
+      { label: 'Community', href: '/contact' },
+      { label: 'Contact', href: '/contact' },
+    ],
   },
   {
     title: 'Legal',
-    links: ['Privacy', 'Terms', 'Security', 'Cookies'],
+    links: [
+      { label: 'Privacy', href: '/contact' },
+      { label: 'Terms', href: '/contact' },
+      { label: 'Security', href: '/contact' },
+      { label: 'Cookies', href: '/contact' },
+    ],
   },
 ];
 
@@ -117,12 +137,12 @@ export default function Footer() {
               </h4>
               <ul className="space-y-2.5">
                 {column.links.map((link) => (
-                  <li key={link}>
+                  <li key={link.label}>
                     <a
-                      href="#"
+                      href={link.href}
                       className="text-sm text-gray-muted hover:text-white transition-colors duration-200"
                     >
-                      {link}
+                      {link.label}
                     </a>
                   </li>
                 ))}
@@ -134,7 +154,7 @@ export default function Footer() {
         {/* Bottom Row */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-white/5">
           <p className="text-xs text-gray-muted">
-            2026 Astra. All rights reserved.
+            &copy; 2026 Astra. All rights reserved.
           </p>
 
           {/* Social Icons */}

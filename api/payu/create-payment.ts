@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { createHash } from 'crypto';
 
 interface PaymentRequest {
   planId: string;
@@ -25,7 +26,7 @@ export default async function handler(
   }
 
   try {
-    const { planId, email, phone, amount, currency, description, purpose } = req.body as PaymentRequest;
+    const { planId, email, phone, amount } = req.body as PaymentRequest;
 
     if (!email || !phone || !amount || !planId) {
       return res.status(400).json({
@@ -61,9 +62,8 @@ export default async function handler(
     const productInfo = `Astra AI ${planId}`;
 
     // Generate hash for PayU
-    const crypto = require('crypto');
     const hashString = `${MERCHANT_KEY}|${txnId}|${amount / 100}|${productInfo}|${email}|${phone}|||||||||||${MERCHANT_SALT}`;
-    const hash = crypto.createHash('sha512').update(hashString).digest('hex');
+    const hash = createHash('sha512').update(hashString).digest('hex');
 
     const params = new URLSearchParams();
     params.append('key', MERCHANT_KEY);

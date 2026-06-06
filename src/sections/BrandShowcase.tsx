@@ -235,14 +235,14 @@ export default function BrandShowcase() {
           <h3 className="text-xl font-bold text-white mb-8">Real-time Data & Processing</h3>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { metric: 'Requests/sec', value: '1.2M', status: 'Optimal', color: 'green' },
-              { metric: 'Avg Response', value: '45ms', status: 'Fast', color: 'green' },
-              { metric: 'Uptime', value: '99.99%', status: 'Excellent', color: 'green' },
+              { metric: 'Requests/sec', value: '1.2M', status: 'Optimal' },
+              { metric: 'Avg Response', value: '45ms', status: 'Fast' },
+              { metric: 'Uptime', value: '99.99%', status: 'Excellent' },
             ].map((item, idx) => (
               <div key={idx} className="p-4 bg-white/[0.04] rounded-lg border border-white/10">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm text-gray-400">{item.metric}</p>
-                  <div className={`px-2 py-1 rounded text-xs font-semibold bg-${item.color}-400/10 text-${item.color}-400`}>
+                  <div className="px-2 py-1 rounded text-xs font-semibold bg-green-400/10 text-green-400">
                     {item.status}
                   </div>
                 </div>
