@@ -50,18 +50,27 @@ export async function createInstamojPayment(planId: string, email: string, phone
 
     console.log('[v0] Creating Instamojo payment for:', planId);
 
-    // Demo implementation - generates a payment link
-    // In production with backend API, this would call /api/instamojo/create-payment
-    const demoPaymentUrl = `https://www.instamojo.com/demo/pay?amount=${plan.amount}&email=${encodeURIComponent(email)}&phone=${phone}&plan=${planId}`;
+    // Call backend API endpoint
+    const response = await fetch('/api/instamojo/create-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        planId,
+        email,
+        phone,
+        amount: plan.amount * 100, // Convert rupees to paise
+        currency: plan.currency,
+        description: plan.description,
+        purpose: `Astra AI ${plan.name}`,
+      }),
+    });
 
-    const data = {
-      success: true,
-      payment_url: demoPaymentUrl,
-      request_id: `req_${Date.now()}`,
-      amount: plan.amount,
-      email: email,
-    };
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to create payment request');
+    }
 
+    const data = await response.json();
     console.log('[v0] Payment request created:', data.payment_url);
     return data;
   } catch (error) {
