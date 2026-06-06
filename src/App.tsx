@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router';
+import { Routes, Route, Navigate, useLocation } from 'react-router';
 import { useAuth } from '@clerk/clerk-react';
-import Navigation from './sections/Navigation';
 import Hero from './sections/Hero';
 import BrandShowcase from './sections/BrandShowcase';
 import Pricing from './sections/Pricing';
@@ -10,7 +9,8 @@ import ChatWidget from './sections/ChatWidget';
 import CursorGlow from './sections/CursorGlow';
 import { logger } from './lib/logger';
 
-// Lazy load heavy animated sections
+// Lazy load all components that use router hooks or Link
+const Navigation = lazy(() => import('./sections/Navigation'));
 const ShowOff = lazy(() => import('./sections/ShowOff'));
 const Proof = lazy(() => import('./sections/Proof'));
 const Features = lazy(() => import('./sections/Features'));
@@ -36,7 +36,9 @@ function HomePage() {
   return (
     <div className="relative min-h-screen bg-[#080c18] text-white overflow-x-hidden">
       <CursorGlow />
-      <Navigation />
+      <Suspense fallback={<div className="h-16 bg-[#080c18]" />}>
+        <Navigation />
+      </Suspense>
       <main>
         <Hero />
         <BrandShowcase />
@@ -56,17 +58,19 @@ function HomePage() {
 // Auth redirect component - must be inside Router
 function AuthRedirect() {
   const location = useLocation();
-  const navigate = useNavigate();
   const { isSignedIn, isLoaded } = useAuth();
 
   useEffect(() => {
     if (isLoaded && isSignedIn) {
       if (location.pathname === '/sign-in' || location.pathname === '/sign-up') {
         logger.info('[Navigation] User already signed in, redirecting to dashboard', { from: location.pathname });
-        navigate('/dashboard', { replace: true });
+        // Redirect to dashboard on mount
+        if (typeof window !== 'undefined') {
+          window.location.href = '/dashboard';
+        }
       }
     }
-  }, [isSignedIn, isLoaded, location.pathname, navigate]);
+  }, [isSignedIn, isLoaded, location.pathname]);
 
   return null;
 }
