@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, lazy, Suspense } from 'react';
 import gsap from 'gsap';
 import { Paperclip, Mic, Send } from 'lucide-react';
 
@@ -13,27 +13,101 @@ const brandLogos = ['TechCrunch', 'Wired', 'The Verge', 'Forbes', 'Bloomberg', '
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  const overlineRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const subheadlineRef = useRef<HTMLParagraphElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
-  const chatRef = useRef<HTMLDivElement>(null);
-  const logosRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      tl.fromTo(overlineRef.current, { opacity: 0 }, { opacity: 1, duration: 0.4 })
-        .fromTo(headlineRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8 }, 0.2)
-        .fromTo(subheadlineRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8 }, 0.4)
-        .fromTo(buttonsRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8 }, 0.6)
-        .fromTo(chatRef.current, { opacity: 0, y: 40, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 1 }, 0.8)
-        .fromTo(logosRef.current?.children || [], { opacity: 0 }, { opacity: 0.5, duration: 0.6, stagger: 0.1 }, 1.2);
+      tl.fromTo(headlineRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6 })
+        .fromTo(subheadlineRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6 }, 0.2)
+        .fromTo(buttonsRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6 }, 0.4);
     }, sectionRef);
 
     return () => ctx.revert();
   }, []);
+
+  return (
+    <section
+      ref={sectionRef}
+      className="relative w-full min-h-screen overflow-hidden bg-navy pt-24"
+    >
+      {/* Simplified Background - removed animated orbs */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-32 -right-32 w-[600px] h-[600px] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #ffb340, transparent)' }} />
+        <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #00c8ff, transparent)' }} />
+      </div>
+
+      <div className="relative z-10 max-w-[1000px] mx-auto px-6 lg:px-12 h-full flex flex-col justify-center">
+        {/* Headline Section */}
+        <div className="mb-12">
+          <div className="text-xs font-medium text-amber-400 uppercase tracking-[3px] mb-4">
+            AI CHAT
+          </div>
+          <h1
+            ref={headlineRef}
+            className="text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight mb-4 leading-tight"
+          >
+            It&apos;s not just chat, it&apos;s a{' '}
+            <span className="bg-gradient-to-r from-amber-400 to-cyan-400 bg-clip-text text-transparent">
+              connection
+            </span>
+          </h1>
+          <p
+            ref={subheadlineRef}
+            className="text-lg md:text-xl text-gray-400 max-w-2xl"
+          >
+            Experience conversations that understand you
+          </p>
+        </div>
+
+        {/* CTA Buttons */}
+        <div ref={buttonsRef} className="flex flex-col sm:flex-row gap-4 mb-16">
+          <button className="px-8 py-4 rounded-full bg-gradient-to-r from-amber-400 to-cyan-400 text-navy font-semibold hover:opacity-90 transition-opacity">
+            Start Chatting
+          </button>
+          <button className="px-8 py-4 rounded-full border border-white/20 text-white hover:bg-white/5 transition-colors font-semibold">
+            Learn More
+          </button>
+        </div>
+
+        {/* Chat Preview - Lazy loaded */}
+        <Suspense fallback={<div className="h-80 bg-white/5 rounded-2xl" />}>
+          <ChatPreview />
+        </Suspense>
+      </div>
+    </section>
+  );
+}
+
+function ChatPreview() {
+  const chatMessages = [
+    { sender: 'user', text: 'Hey, how are you feeling today?' },
+    { sender: 'ai', text: "I'm doing great! Ready to chat whenever you are." },
+  ];
+
+  return (
+    <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 max-w-lg">
+      <div className="space-y-4">
+        {chatMessages.map((msg, i) => (
+          <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-xs px-4 py-2 rounded-lg ${msg.sender === 'user' ? 'bg-amber-500/30 text-white' : 'bg-white/10 text-gray-300'}`}>
+              {msg.text}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex gap-2 mt-6 pt-4 border-t border-white/10">
+        <input type="text" placeholder="Type a message..." className="flex-1 bg-white/5 rounded-lg px-4 py-2 text-white placeholder:text-gray-500 border border-white/10" />
+        <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+          <Send size={20} className="text-amber-400" />
+        </button>
+      </div>
+    </div>
+  );
+}
 
   return (
     <section

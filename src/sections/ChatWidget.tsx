@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageCircle, X, Send, Paperclip, Image, Smile, Crown } from 'lucide-react';
+import { MessageCircle, X, Send, Paperclip, Crown } from 'lucide-react';
 import { loadSettings } from '../lib/adminStore';
 import { getUsageToday, incrementUsage } from '../lib/adminStore';
 

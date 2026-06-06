@@ -1,6 +1,5 @@
 import { useUser, useClerk } from '@clerk/clerk-react';
 import { Link } from 'react-router';
-import { useState } from 'react';
 import { loadSettings, getUsageToday } from '../lib/adminStore';
 import {
   MessageCircle, Sparkles, LogOut, Settings, Crown,
@@ -14,12 +13,10 @@ export default function Dashboard() {
   const usage = getUsageToday();
   const limit = settings.dailyFreeLimit || 20;
   const usagePercent = Math.min((usage / limit) * 100, 100);
-  const [chatOpen, setChatOpen] = useState(false);
 
   const firstName = user?.firstName || user?.emailAddresses[0]?.emailAddress?.split('@')[0] || 'there';
 
   const freeModels = settings.models.filter(m => m.tier === 'free');
-  const proModels = settings.models.filter(m => m.tier !== 'free');
 
   return (
     <div className="min-h-screen bg-[#080c18] text-white">

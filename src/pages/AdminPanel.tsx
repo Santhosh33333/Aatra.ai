@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { verifyAdmin } from '../lib/adminConfig';
 import { loadSettings, saveSettings } from '../lib/adminStore';
 import type { AdminSettings } from '../lib/adminConfig';
