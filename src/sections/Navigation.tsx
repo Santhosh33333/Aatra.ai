@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Sparkles } from 'lucide-react';
 import { useAuth, useUser } from '@clerk/clerk-react';
 import { Link } from 'react-router';
 
@@ -30,10 +30,28 @@ export default function Navigation() {
       style={{ height: 72 }}
     >
       <div className="max-w-[1200px] mx-auto h-full flex items-center justify-between px-6 lg:px-12">
+
         {/* Logo */}
-        <a href="/" className="flex items-center gap-3">
-          <img src="/app-logo.png" alt="Astra" className="w-6 h-6" />
-          <span className="text-white font-semibold text-base">Astra</span>
+        <a href="/" className="flex items-center gap-3 group">
+          {/* Icon mark */}
+          <div className="relative w-9 h-9 flex-shrink-0">
+            {/* Outer glow ring */}
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-400 to-cyan-400 opacity-20 blur-sm group-hover:opacity-40 transition-opacity duration-300" />
+            {/* Main icon bg */}
+            <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 via-orange-400 to-cyan-400 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform duration-300">
+              <Sparkles size={17} className="text-[#080c18]" strokeWidth={2.5} />
+            </div>
+          </div>
+
+          {/* Wordmark */}
+          <div className="flex flex-col leading-none">
+            <span className="text-white font-bold text-lg tracking-tight" style={{ fontFamily: 'Sora, Inter, sans-serif', letterSpacing: '-0.02em' }}>
+              Astra
+            </span>
+            <span className="text-[10px] font-medium tracking-widest uppercase" style={{ background: 'linear-gradient(90deg, #ffb340, #00c8ff)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '0.12em' }}>
+              AI
+            </span>
+          </div>
         </a>
 
         {/* Desktop Nav */}
