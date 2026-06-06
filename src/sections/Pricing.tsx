@@ -6,7 +6,6 @@ import { Check } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const ADMIN_EMAIL = 'santhoshkrishna958@gmail.com';
 
 const plans = [
   {
@@ -74,10 +73,7 @@ export default function Pricing() {
     if (plan.action === 'signup') {
       navigate('/sign-up');
     } else if (plan.action === 'contact') {
-      const body = encodeURIComponent(
-        `Hi,\n\nI would like to upgrade to the ${plan.name} plan (${plan.price}/month).\n\nPlease get back to me with payment details.\n\nThank you!`
-      );
-      window.location.href = `mailto:${ADMIN_EMAIL}?subject=${encodeURIComponent(plan.subject)}&body=${body}`;
+      navigate(`/checkout?plan=${plan.name.toLowerCase()}`);
     }
   };
 

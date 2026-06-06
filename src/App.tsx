@@ -16,6 +16,8 @@ const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const SignInPage = lazy(() => import('./pages/SignInPage'));
 const SignUpPage = lazy(() => import('./pages/SignUpPage'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Contact = lazy(() => import('./pages/Contact'));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isSignedIn, isLoaded } = useAuth();
@@ -71,6 +73,16 @@ export default function App() {
       <Route path="/admin" element={
         <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
           <AdminPanel />
+        </Suspense>
+      } />
+      <Route path="/checkout" element={
+        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
+          <Checkout />
+        </Suspense>
+      } />
+      <Route path="/contact" element={
+        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
+          <Contact />
         </Suspense>
       } />
       <Route path="*" element={<Navigate to="/" replace />} />
