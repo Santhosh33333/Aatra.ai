@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import { Check } from 'lucide-react';
 import { PAYMENT_PLANS, OFFERS, ADMIN_EMAIL } from '../lib/paymentPlans';
-import { createRazorpayOrder, loadRazorpayScript, RAZORPAY_CONFIG, RAZORPAY_PLANS } from '../lib/razorpay';
+import { createInstamojPayment } from '../lib/instamojo';
 
 export default function Checkout() {
   const [searchParams] = useSearchParams();
@@ -11,11 +11,8 @@ export default function Checkout() {
   const [selectedOffer, setSelectedOffer] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Load Razorpay script on component mount
-  useEffect(() => {
-    loadRazorpayScript();
-  }, []);
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
 
   const plan = PAYMENT_PLANS.find(p => p.id === planId);
   if (!plan) return <div className="min-h-screen bg-[#080c18]" />;
@@ -26,47 +23,26 @@ export default function Checkout() {
       return;
     }
 
+    if (!email || !phone) {
+      setError('Please enter email and phone number');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      console.log('[v0] Starting Razorpay checkout for plan:', planId);
+      console.log('[v0] Starting Instamojo payment for plan:', planId);
       
-      // Create Razorpay order
-      const razorpayPlanId = `${planId.replace('-', '_')}_monthly`; // Convert pro to pro_monthly
-      const orderData = await createRazorpayOrder(razorpayPlanId, 'customer@example.com');
+      // Create Instamojo payment
+      const instamojoPlanId = `${planId.replace('-', '_')}_monthly`;
+      const paymentData = await createInstamojPayment(instamojoPlanId, email, phone);
       
-      // Open Razorpay Checkout
-      if (window.Razorpay) {
-        const options = {
-          key: RAZORPAY_CONFIG.keyId,
-          amount: RAZORPAY_PLANS[razorpayPlanId as keyof typeof RAZORPAY_PLANS]?.amount,
-          currency: RAZORPAY_CONFIG.currency,
-          name: 'Astra AI',
-          description: plan.name + ' Plan',
-          order_id: orderData.orderId,
-          handler: (response: any) => {
-            console.log('[v0] Payment successful:', response);
-            // Verify payment and activate subscription
-            navigate('/checkout-success?orderId=' + orderData.orderId);
-          },
-          prefill: {
-            name: '',
-            email: '',
-            contact: '',
-          },
-          notes: {
-            planId,
-            offer: selectedOffer,
-          },
-          theme: {
-            color: '#ffb340',
-          },
-        };
-
-        const razorpayInstance = new window.Razorpay(options);
-        razorpayInstance.open();
+      // Redirect to payment link
+      if (paymentData.payment_url) {
+        console.log('[v0] Redirecting to Instamojo:', paymentData.payment_url);
+        window.location.href = paymentData.payment_url;
       } else {
-        throw new Error('Razorpay not loaded');
+        throw new Error('Payment URL not received');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Payment error occurred');
@@ -169,9 +145,33 @@ export default function Checkout() {
               </div>
 
               <div className="border-t border-white/10 pt-6 mb-6">
+                <div className="space-y-3 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Email</label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:border-amber-400 text-sm"
+                      placeholder="your@email.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Phone</label>
+                    <input
+                      type="tel"
+                      required
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:border-amber-400 text-sm"
+                      placeholder="+91 10000 00000"
+                    />
+                  </div>
+                </div>
                 <div className="flex justify-between text-xl font-bold">
                   <span>Total</span>
-                  <span>${plan.price}</span>
+                  <span>₹{plan.price}</span>
                 </div>
                 <div className="text-sm text-gray-400 mt-2">Billed monthly</div>
               </div>
