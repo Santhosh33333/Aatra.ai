@@ -203,7 +203,7 @@ export default function Proof() {
             
             {/* Astra branding */}
             <circle cx="400" cy="340" r="20" fill="none" stroke="#00c8ff" strokeWidth="2" opacity="0.4"/>
-            <text x="400" y="350" fontSize="16" fill="#88a5d8" fontFamily="Arial" textAnchor="middle" fontWeight="bold">Astra AI</text>
+            <text x="400" y="350" fontSize="16" fill="#88a5d8" fontFamily="Arial" textAnchor="middle" fontWeight="bold">Aatra AI</text>
           </svg>
         </div>
 

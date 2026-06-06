@@ -60,18 +60,18 @@ export default function Footer() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         footerRef.current,
-        { opacity: 0 },
+        { opacity: 0, y: 20 },
         {
           opacity: 1,
+          y: 0,
           duration: 0.6,
           scrollTrigger: {
             trigger: footerRef.current,
-            start: 'top 90%',
+            start: 'top 95%',
           },
         }
       );
     }, footerRef);
-
     return () => ctx.revert();
   }, []);
 
@@ -85,7 +85,7 @@ export default function Footer() {
   return (
     <footer
       ref={footerRef}
-      className="relative w-full bg-navy-deep border-t border-white/5 opacity-0"
+      className="relative w-full bg-navy-deep border-t border-white/5"
     >
       <div className="max-w-[1200px] mx-auto px-6 lg:px-12 py-16 md:py-20">
         {/* Top Row */}
@@ -96,7 +96,7 @@ export default function Footer() {
               <div className="w-6 h-6 rounded bg-gradient-to-br from-amber to-cyan flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Sparkles size={14} className="text-[#080c18]" strokeWidth={2} />
               </div>
-              <span className="text-white font-semibold text-base">Astra</span>
+              <span className="text-white font-semibold text-base">Aatra AI</span>
             </a>
             <p className="text-sm text-gray-muted">
               AI-powered conversations that matter
@@ -154,7 +154,7 @@ export default function Footer() {
         {/* Bottom Row */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-white/5">
           <p className="text-xs text-gray-muted">
-            &copy; 2026 Astra. All rights reserved.
+            &copy; 2026 Aatra AI. All rights reserved.
           </p>
 
           {/* Social Icons */}
