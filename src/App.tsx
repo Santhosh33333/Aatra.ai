@@ -3,7 +3,6 @@ import { Routes, Route, Navigate, useLocation } from 'react-router';
 import { useAuth } from '@clerk/clerk-react';
 import Hero from './sections/Hero';
 import BrandShowcase from './sections/BrandShowcase';
-import Pricing from './sections/Pricing';
 import Footer from './sections/Footer';
 import ChatWidget from './sections/ChatWidget';
 import CursorGlow from './sections/CursorGlow';
@@ -14,6 +13,7 @@ const Navigation = lazy(() => import('./sections/Navigation'));
 const ShowOff = lazy(() => import('./sections/ShowOff'));
 const Proof = lazy(() => import('./sections/Proof'));
 const Features = lazy(() => import('./sections/Features'));
+const Pricing = lazy(() => import('./sections/Pricing'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const AdminGateways = lazy(() => import('./pages/admin-gateways'));
 const SignInPage = lazy(() => import('./pages/SignInPage'));
@@ -47,7 +47,9 @@ function HomePage() {
           <Proof />
           <Features />
         </Suspense>
-        <Pricing />
+        <Suspense fallback={<div className="h-screen bg-[#080c18]" />}>
+          <Pricing />
+        </Suspense>
       </main>
       <Footer />
       <ChatWidget />
