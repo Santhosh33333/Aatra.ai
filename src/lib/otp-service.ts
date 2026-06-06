@@ -17,42 +17,6 @@ class OTPService {
   private otpStore: Map<string, OTPData> = new Map();
   private OTP_EXPIRY_MS: number = 10 * 60 * 1000; // 10 minutes
   private MAX_ATTEMPTS: number = 3;
-  private otpChangeListeners: ((email: string, code: string) => void)[] = [];
-
-  /**
-   * Subscribe to OTP changes for auto-fill
-   */
-  onOTPReceived(callback: (email: string, code: string) => void): () => void {
-    this.otpChangeListeners.push(callback);
-    // Return unsubscribe function
-    return () => {
-      this.otpChangeListeners = this.otpChangeListeners.filter(cb => cb !== callback);
-    };
-  }
-
-  /**
-   * Notify all listeners of new OTP
-   */
-  private notifyOTPReceived(email: string, code: string): void {
-    this.otpChangeListeners.forEach(callback => {
-      try {
-        callback(email, code);
-        logger.debug(`[OTP] Notified listener of OTP for ${email}`);
-      } catch (error) {
-        logger.error(`[OTP] Error notifying OTP listener`, error);
-      }
-    });
-  }
-
-  /**
-   * Get last sent OTP for email (for testing/demo)
-   */
-  getLastOTP(email: string): string | null {
-    if (import.meta.env.DEV) {
-      return localStorage.getItem(`otp_${email}`) || null;
-    }
-    return null;
-  }
 
   /**
    * Generate a random OTP code
@@ -79,8 +43,6 @@ class OTPService {
       // For demo, store in localStorage for testing
       if (import.meta.env.DEV) {
         localStorage.setItem(`otp_${email}`, code);
-        // Notify listeners for auto-fill
-        setTimeout(() => this.notifyOTPReceived(email, code), 100);
       }
       
       logger.success(`[OTP] OTP sent successfully to ${email}`);
