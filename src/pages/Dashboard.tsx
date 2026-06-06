@@ -1,6 +1,8 @@
 import { useUser, useClerk } from '@clerk/clerk-react';
 import { Link } from 'react-router';
+import { useEffect } from 'react';
 import { loadSettings, getUsageToday } from '../lib/adminStore';
+import { logger } from '../lib/logger';
 import {
   MessageCircle, Sparkles, LogOut, Settings, Crown,
   TrendingUp, Zap, User, ChevronRight, Mail, Star
@@ -17,6 +19,15 @@ export default function Dashboard() {
   const firstName = user?.firstName || user?.emailAddresses[0]?.emailAddress?.split('@')[0] || 'there';
 
   const freeModels = settings.models.filter(m => m.tier === 'free');
+
+  // Log dashboard initialization
+  useEffect(() => {
+    logger.info('[Dashboard] User dashboard loaded', {
+      user: user?.fullName || user?.emailAddresses[0]?.emailAddress,
+      usage: `${usage}/${limit}`,
+      models: freeModels.length,
+    });
+  }, [user, usage, limit, freeModels.length]);
 
   return (
     <div className="min-h-screen bg-[#080c18] text-white">
@@ -89,12 +100,18 @@ export default function Dashboard() {
         <div className="px-3 pb-4 border-t border-white/8 pt-3">
           <div className="flex items-center gap-3 px-2 py-2 rounded-xl">
             <img 
-              src={user?.imageUrl} 
+              src={user?.imageUrl || ''} 
               alt="User profile" 
               className="w-8 h-8 rounded-full object-cover ring-2 ring-white/10" 
               onError={(e) => {
                 const img = e.target as HTMLImageElement;
+                if (img.src && !img.src.includes('data:image')) {
+                  logger.warn('[Dashboard] User avatar image failed to load, using fallback SVG', { originalSrc: img.src });
+                }
                 img.src = `data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2216%22 fill=%22%2388a5d8%22/%3E%3C/svg%3E`;
+              }}
+              onLoad={() => {
+                logger.debug('[Dashboard] User avatar loaded successfully');
               }}
               loading="lazy"
             />

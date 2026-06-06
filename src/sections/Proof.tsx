@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Lock, Users, Globe, Sparkles } from 'lucide-react';
+import { logger } from '../lib/logger';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -94,6 +95,8 @@ export default function Proof() {
         }
       });
     }, sectionRef);
+
+    logger.info('[Proof] Section animations initialized');
 
     return () => ctx.revert();
   }, []);

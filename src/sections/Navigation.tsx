@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X, Sparkles } from 'lucide-react';
 import { useAuth, useUser } from '@clerk/clerk-react';
 import { Link } from 'react-router';
+import { logger } from '../lib/logger';
 
 export default function Navigation() {
   const [scrolled, setScrolled] = useState(false);
@@ -12,6 +13,7 @@ export default function Navigation() {
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll, { passive: true });
+    logger.debug('[Navigation] Scroll listener attached');
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -77,7 +79,13 @@ export default function Navigation() {
                   className="w-5 h-5 rounded-full object-cover" 
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
+                    if (img.src && !img.src.includes('data:image')) {
+                      logger.warn('[Navigation] Profile image failed to load', { url: img.src });
+                    }
                     img.src = `data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22%3E%3Ccircle cx=%2210%22 cy=%2210%22 r=%2210%22 fill=%22%2388a5d8%22/%3E%3C/svg%3E`;
+                  }}
+                  onLoad={() => {
+                    logger.debug('[Navigation] Profile image loaded');
                   }}
                   loading="lazy"
                 />
