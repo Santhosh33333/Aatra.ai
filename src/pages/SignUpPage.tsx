@@ -1,6 +1,8 @@
 import { SignUp } from '@clerk/clerk-react';
 import { Link } from 'react-router';
 import { Sparkles, Check } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { logger } from '../lib/logger';
 
 const perks = [
   '20 free messages every day',
@@ -10,6 +12,20 @@ const perks = [
 ];
 
 export default function SignUpPage() {
+  const [logs, setLogs] = useState<string[]>([
+    `[${new Date().toLocaleTimeString()}] [SignUp] Page loaded`,
+  ]);
+
+  useEffect(() => {
+    logger.info('[SignUp] Signup page mounted');
+    const timestamp = new Date().toLocaleTimeString();
+    setLogs(prev => [...prev, `[${timestamp}] [SignUp] Form component initialized`]);
+    const addLogTimer = setTimeout(() => {
+      setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] [SignUp] Signup form ready`]);
+    }, 500);
+    return () => clearTimeout(addLogTimer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#080c18] flex flex-col">
       {/* Background */}
@@ -36,7 +52,7 @@ export default function SignUpPage() {
         </Link>
       </div>
 
-      {/* Main content — two column on desktop */}
+      {/* Main content */}
       <div className="relative z-10 flex-1 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-4xl flex gap-12 items-center">
 
@@ -106,6 +122,21 @@ export default function SignUpPage() {
               {' '}and{' '}
               <span className="text-gray-500 hover:text-gray-400 cursor-pointer">Privacy Policy</span>
             </p>
+
+            {/* Activity Logs */}
+            <div className="mt-6 p-3 bg-black/40 border border-amber-500/20 rounded-lg">
+              <div className="text-amber-400 font-semibold mb-2 flex items-center gap-2 text-sm">
+                <div className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse" />
+                Activity ({logs.length})
+              </div>
+              <div className="space-y-0.5 max-h-32 overflow-y-auto font-mono text-[10px]">
+                {logs.map((log, idx) => (
+                  <div key={idx} className="text-gray-500 hover:text-amber-300 transition-colors pl-2 border-l border-amber-500/20">
+                    {log}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
