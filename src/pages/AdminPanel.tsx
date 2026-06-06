@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { verifyAdmin } from '../lib/adminConfig';
 import { loadSettings, saveSettings } from '../lib/adminStore';
 import type { AdminSettings } from '../lib/adminConfig';
-import { Eye, EyeOff, Plus, Trash2, Save, LogOut, Settings, Palette, Key, Cpu, Mail } from 'lucide-react';
+import { logger } from '../lib/logger';
+import { Eye, EyeOff, Plus, Trash2, Save, LogOut, Settings, Palette, Key, Cpu, Mail, Image, X } from 'lucide-react';
 
 export default function AdminPanel() {
   const [authed, setAuthed] = useState(false);
@@ -14,14 +15,66 @@ export default function AdminPanel() {
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'api' | 'models' | 'theme' | 'contact'>('general');
   const [newModel, setNewModel] = useState({ id: '', name: '', tier: 'pro' as 'free'|'pro'|'ultra', description: '' });
+  const [logoPreview, setLogoPreview] = useState<string>(localStorage.getItem('admin_logo') || '');
+  const [dragActive, setDragActive] = useState(false);
 
   const handleLogin = () => {
     if (verifyAdmin(email, password)) {
       setAuthed(true);
       setLoginError('');
+      logger.success('[AdminPanel] Admin logged in successfully');
     } else {
       setLoginError('Invalid credentials. Access denied.');
+      logger.warn('[AdminPanel] Failed login attempt');
     }
+  };
+
+  const handleLogoUpload = (file: File) => {
+    if (file.size > 5 * 1024 * 1024) {
+      logger.error('[AdminPanel] Logo file too large', { size: file.size });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const preview = e.target?.result as string;
+      setLogoPreview(preview);
+      localStorage.setItem('admin_logo', preview);
+      logger.info('[AdminPanel] Logo uploaded successfully', { filename: file.name, size: file.size });
+    };
+    reader.onerror = () => {
+      logger.error('[AdminPanel] Failed to read logo file');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+      logger.debug('[AdminPanel] Logo drag enter');
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+      logger.debug('[AdminPanel] Logo drag leave');
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    const files = e.dataTransfer.files;
+    if (files && files[0]) {
+      logger.info('[AdminPanel] Logo dropped');
+      handleLogoUpload(files[0]);
+    }
+  };
+
+  const handleLogoRemove = () => {
+    setLogoPreview('');
+    localStorage.removeItem('admin_logo');
+    logger.info('[AdminPanel] Logo removed');
   };
 
   const handleSave = () => {
@@ -296,7 +349,71 @@ export default function AdminPanel() {
 
           {activeTab === 'theme' && (
             <div className="space-y-5">
-              <h2 className="text-lg font-semibold">Theme & Colors</h2>
+              <h2 className="text-lg font-semibold">Theme & Branding</h2>
+
+              {/* Logo Upload Section */}
+              <div className="p-5 bg-gradient-to-br from-amber-400/10 to-cyan-400/10 border border-amber-400/30 rounded-xl">
+                <div className="flex items-center gap-2 mb-3">
+                  <Image size={18} className="text-amber-400" />
+                  <label className="text-sm font-semibold text-white">Logo Upload</label>
+                </div>
+                <p className="text-xs text-gray-400 mb-4">Upload a custom logo for your brand (Max 5MB, PNG/JPG)</p>
+                
+                {logoPreview ? (
+                  <div className="mb-4">
+                    <div className="relative w-48 h-32 rounded-lg overflow-hidden border-2 border-amber-400/50 bg-white/5 flex items-center justify-center">
+                      <img src={logoPreview} alt="Logo preview" className="max-w-full max-h-full object-contain" />
+                      <button
+                        onClick={handleLogoRemove}
+                        className="absolute top-2 right-2 p-1 bg-red-500/80 hover:bg-red-600 rounded-lg transition-colors"
+                      >
+                        <X size={14} className="text-white" />
+                      </button>
+                    </div>
+                    <p className="text-xs text-amber-400 mt-2">Logo preview above</p>
+                  </div>
+                ) : (
+                  <div
+                    onDragEnter={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDragOver={handleDrag}
+                    onDrop={handleDrop}
+                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all ${
+                      dragActive
+                        ? 'border-amber-400 bg-amber-400/10'
+                        : 'border-white/20 bg-white/5 hover:bg-white/10'
+                    }`}
+                  >
+                    <div className="mb-3">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-amber-400 to-cyan-400 flex items-center justify-center mx-auto">
+                        <Image size={20} className="text-[#080c18]" />
+                      </div>
+                    </div>
+                    <p className="text-sm text-white font-medium mb-1">Drag & drop your logo</p>
+                    <p className="text-xs text-gray-400 mb-4">or click to browse</p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) {
+                          logger.info('[AdminPanel] Logo file selected');
+                          handleLogoUpload(e.target.files[0]);
+                        }
+                      }}
+                      className="hidden"
+                      id="logo-upload"
+                    />
+                    <label
+                      htmlFor="logo-upload"
+                      className="inline-block px-4 py-2 bg-gradient-to-r from-amber-400 to-cyan-400 text-[#080c18] font-semibold rounded-lg hover:opacity-90 transition-opacity cursor-pointer"
+                    >
+                      Select File
+                    </label>
+                  </div>
+                )}
+              </div>
+
+              {/* Color Theme Section */}
               <div>
                 <label className="text-xs text-gray-400 mb-1.5 block">Color Theme</label>
                 <div className="grid grid-cols-2 gap-3">
