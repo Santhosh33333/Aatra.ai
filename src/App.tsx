@@ -66,7 +66,6 @@ function AuthRedirect() {
     if (isLoaded && isSignedIn) {
       if (location.pathname === '/sign-in' || location.pathname === '/sign-up') {
         logger.info('[Navigation] User already signed in, redirecting to dashboard', { from: location.pathname });
-        // Redirect to dashboard on mount
         if (typeof window !== 'undefined') {
           window.location.href = '/dashboard';
         }
@@ -78,55 +77,53 @@ function AuthRedirect() {
 }
 
 export default function App() {
-  const location = useLocation();
-
   useEffect(() => {
-    logger.info('[Navigation] Route changed', { path: location.pathname });
-  }, [location.pathname]);
+    logger.info('[Navigation] App mounted');
+  }, []);
 
   return (
     <>
       <AuthRedirect />
       <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/sign-in" element={
-        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
-          <SignInPage />
-        </Suspense>
-      } />
-      <Route path="/sign-up" element={
-        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
-          <SignUpPage />
-        </Suspense>
-      } />
-      <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <Suspense fallback={<div className="min-h-screen bg-[#080c18] flex items-center justify-center"><div className="w-8 h-8 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" /></div>}>
-            <Dashboard />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/sign-in" element={
+          <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
+            <SignInPage />
           </Suspense>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin" element={
-        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
-          <AdminPanel />
-        </Suspense>
-      } />
-      <Route path="/admin-gateways" element={
-        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
-          <AdminGateways />
-        </Suspense>
-      } />
-      <Route path="/checkout" element={
-        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
-          <Checkout />
-        </Suspense>
-      } />
-      <Route path="/contact" element={
-        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
-          <Contact />
-        </Suspense>
-      } />
-      <Route path="*" element={<Navigate to="/" replace />} />
+        } />
+        <Route path="/sign-up" element={
+          <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
+            <SignUpPage />
+          </Suspense>
+        } />
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Suspense fallback={<div className="min-h-screen bg-[#080c18] flex items-center justify-center"><div className="w-8 h-8 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" /></div>}>
+              <Dashboard />
+            </Suspense>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin" element={
+          <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
+            <AdminPanel />
+          </Suspense>
+        } />
+        <Route path="/admin-gateways" element={
+          <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
+            <AdminGateways />
+          </Suspense>
+        } />
+        <Route path="/checkout" element={
+          <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
+            <Checkout />
+          </Suspense>
+        } />
+        <Route path="/contact" element={
+          <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
+            <Contact />
+          </Suspense>
+        } />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   );
