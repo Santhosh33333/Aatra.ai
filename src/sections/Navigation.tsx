@@ -71,7 +71,16 @@ export default function Navigation() {
             <Link to="/dashboard"
               className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white/8 border border-white/10 hover:bg-white/12 transition-all text-sm font-medium text-white">
               {user?.imageUrl && (
-                <img src={user.imageUrl} alt="" className="w-5 h-5 rounded-full object-cover" />
+                <img 
+                  src={user.imageUrl} 
+                  alt="Profile" 
+                  className="w-5 h-5 rounded-full object-cover" 
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    img.src = `data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22%3E%3Ccircle cx=%2210%22 cy=%2210%22 r=%2210%22 fill=%22%2388a5d8%22/%3E%3C/svg%3E`;
+                  }}
+                  loading="lazy"
+                />
               )}
               Dashboard
             </Link>

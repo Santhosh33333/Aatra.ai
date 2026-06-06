@@ -73,7 +73,16 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <a href="#" className="flex items-center gap-3 mb-3">
-              <img src="/app-logo.png" alt="Astra" className="w-6 h-6" />
+              <img 
+                src="/app-logo.png" 
+                alt="Astra" 
+                className="w-6 h-6" 
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.style.display = 'none';
+                }}
+                loading="lazy"
+              />
               <span className="text-white font-semibold text-base">Astra</span>
             </a>
             <p className="text-sm text-gray-muted">

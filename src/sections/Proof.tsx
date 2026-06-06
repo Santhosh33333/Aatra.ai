@@ -136,7 +136,16 @@ export default function Proof() {
           {/* Center Logo */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-amber to-cyan flex items-center justify-center shadow-glow-strong">
-              <img src="/app-logo.png" alt="Astra" className="w-10 h-10 md:w-14 md:h-14" />
+              <img 
+                src="/app-logo.png" 
+                alt="Astra" 
+                className="w-10 h-10 md:w-14 md:h-14" 
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.style.display = 'none';
+                }}
+                loading="lazy"
+              />
             </div>
           </div>
 
@@ -168,9 +177,14 @@ export default function Proof() {
           className="mt-16 md:mt-20 w-full max-w-[800px] opacity-0"
         >
           <img
-            src="/app-screenshot.jpg"
+            src="/app-screenshot.png"
             alt="Astra Chat App Interface"
             className="w-full rounded-3xl border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.5)]"
+            onError={(e) => {
+              const img = e.target as HTMLImageElement;
+              img.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22400%22%3E%3Crect fill=%22%231e2332%22 width=%22800%22 height=%22400%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2224%22 fill=%22%2388a5d8%22 font-family=%22Arial%22%3EApp Screenshot%3C/text%3E%3C/svg%3E';
+            }}
+            loading="lazy"
           />
         </div>
 

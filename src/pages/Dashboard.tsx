@@ -88,7 +88,16 @@ export default function Dashboard() {
         {/* User + Signout */}
         <div className="px-3 pb-4 border-t border-white/8 pt-3">
           <div className="flex items-center gap-3 px-2 py-2 rounded-xl">
-            <img src={user?.imageUrl} alt="" className="w-8 h-8 rounded-full object-cover ring-2 ring-white/10" />
+            <img 
+              src={user?.imageUrl} 
+              alt="User profile" 
+              className="w-8 h-8 rounded-full object-cover ring-2 ring-white/10" 
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                img.src = `data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2216%22 fill=%22%2388a5d8%22/%3E%3C/svg%3E`;
+              }}
+              loading="lazy"
+            />
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-white truncate">{user?.fullName || firstName}</p>
               <p className="text-[10px] text-gray-600 truncate">{user?.emailAddresses[0]?.emailAddress}</p>
