@@ -117,7 +117,7 @@ export default function AdminPanel() {
               <Settings size={28} className="text-[#080c18]" />
             </div>
             <h1 className="text-2xl font-bold text-white">Admin Access</h1>
-            <p className="text-gray-500 text-sm mt-1">Astra Control Panel</p>
+            <p className="text-gray-500 text-sm mt-1">Aatra Control Panel</p>
           </div>
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
             <div>
@@ -181,7 +181,7 @@ export default function AdminPanel() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-cyan-400 flex items-center justify-center">
               <Settings size={16} className="text-[#080c18]" />
             </div>
-            <span className="font-semibold">Astra Admin Panel</span>
+            <span className="font-semibold">Aatra Admin Panel</span>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -279,15 +279,15 @@ export default function AdminPanel() {
                 <p className="text-xs text-amber-400">⚠️ API key is stored in your browser only. For production, use environment variables in <code className="bg-white/10 px-1 rounded">.env</code> file.</p>
               </div>
               <div>
-                <label className="text-xs text-gray-400 mb-1.5 block">OpenAI API Key</label>
+                <label className="text-xs text-gray-400 mb-1.5 block">Gemini API Key</label>
                 <input
                   type="password"
-                  value={settings.apiKey || ''}
-                  onChange={e => setSettings(p => ({ ...p, apiKey: e.target.value }))}
-                  placeholder="sk-proj-..."
+                  value={settings.geminiApiKey || ''}
+                  onChange={e => setSettings(p => ({ ...p, geminiApiKey: e.target.value }))}
+                  placeholder="AIza..."
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-400 transition-colors font-mono"
                 />
-                <p className="text-xs text-gray-500 mt-1">Leave blank to use the key from <code className="bg-white/10 px-1 rounded">.env</code> file (recommended).</p>
+                <p className="text-xs text-gray-500 mt-1">Get a free key at <a href="https://aistudio.google.com" target="_blank" rel="noreferrer" className="text-amber-400 hover:underline">aistudio.google.com</a>. Leave blank to use <code className="bg-white/10 px-1 rounded">VITE_GEMINI_API_KEY</code> from <code className="bg-white/10 px-1 rounded">.env</code> (recommended).</p>
               </div>
             </div>
           )}

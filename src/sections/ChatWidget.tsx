@@ -31,7 +31,7 @@ export default function ChatWidget() {
 
   const limit = settings.dailyFreeLimit || 30;
 
-  const [limitReached, setLimitReached] = useState(() => getUsageToday() >= limit);
+  const limitReached = usage >= limit;
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth < 768 : false
   );
@@ -42,7 +42,6 @@ export default function ChatWidget() {
   }, []);
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
   useEffect(() => { if (isOpen) setTimeout(() => inputRef.current?.focus(), 300); }, [isOpen]);
-  useEffect(() => { setLimitReached(usage >= limit); }, [usage, limit]);
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', handleResize, { passive: true });
