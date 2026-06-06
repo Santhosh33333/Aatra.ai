@@ -1,169 +1,45 @@
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Brain, Mic, Palette, Users } from 'lucide-react';
-
-gsap.registerPlugin(ScrollTrigger);
+import { Brain, Zap, Shield, Globe, Sparkles, Clock } from 'lucide-react';
 
 const features = [
-  {
-    icon: Brain,
-    iconBg: 'rgba(0,200,255,0.15)',
-    iconColor: '#00c8ff',
-    title: 'Smart Replies',
-    description: 'AI-powered suggestions that understand context and tone',
-  },
-  {
-    icon: Mic,
-    iconBg: 'rgba(255,179,64,0.15)',
-    iconColor: '#ffb340',
-    title: 'Voice Messages',
-    description: 'Send and receive voice messages with crystal-clear quality',
-  },
-  {
-    icon: Palette,
-    iconBg: 'rgba(0,200,255,0.15)',
-    iconColor: '#00c8ff',
-    title: 'Custom Themes',
-    description: 'Personalize your chat experience with beautiful themes',
-  },
-  {
-    icon: Users,
-    iconBg: 'rgba(255,179,64,0.15)',
-    iconColor: '#ffb340',
-    title: 'Group Chats',
-    description: 'Create groups and stay connected with multiple friends',
-  },
+  { icon: Brain, title: 'Context-Aware AI', desc: 'Gemini remembers your conversation and gives smarter answers the longer you chat.', color: '#7c3aed' },
+  { icon: Zap, title: 'Lightning Fast', desc: 'Responses in under a second. Gemini 2.0 Flash is built for speed without sacrificing quality.', color: '#10b981' },
+  { icon: Shield, title: 'Private & Secure', desc: 'Your conversations are never stored or used for training. What you say stays with you.', color: '#3b82f6' },
+  { icon: Globe, title: '50+ Languages', desc: 'Chat in any language — Aatra AI understands and responds fluently across the globe.', color: '#f59e0b' },
+  { icon: Sparkles, title: 'Always Improving', desc: 'Powered by the latest Gemini models — benefits from Google\'s continuous AI research.', color: '#ec4899' },
+  { icon: Clock, title: '30 Free Daily', desc: 'Generous free tier — 30 messages every single day, no credit card ever required.', color: '#34d399' },
 ];
 
 export default function Features() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Header animation
-      gsap.fromTo(
-        headerRef.current?.children || [],
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: headerRef.current,
-            start: 'top 80%',
-          },
-        }
-      );
-
-      // Horizontal scroll animation
-      const track = trackRef.current;
-      if (!track) return;
-
-      const cards = track.querySelectorAll('.feature-card');
-      const totalWidth = track.scrollWidth - window.innerWidth + 100;
-
-      gsap.to(track, {
-        x: -totalWidth,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 20%',
-          end: () => `+=${totalWidth}`,
-          scrub: 1,
-          pin: true,
-          anticipatePin: 1,
-        },
-      });
-
-      // Card entrance animations
-      cards.forEach((card) => {
-        gsap.fromTo(
-          card,
-          { opacity: 0.5, y: 20 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.5,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: card,
-              start: 'left 90%',
-              containerAnimation: gsap.getById?.('horizontal'),
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section
-      ref={sectionRef}
-      id="features"
-      className="relative w-full bg-gradient-to-b from-navy-deep to-navy overflow-hidden"
-    >
-        <div ref={headerRef} className="text-center pt-20 md:pt-32 pb-12 px-6">
-        <div className="text-xs font-medium text-gray-muted uppercase tracking-[3px] mb-4">
-          FEATURES
+    <section id="features" className="w-full py-24"
+      style={{ background: 'linear-gradient(180deg,#0a0f08,#08060f)' }}>
+      <div className="max-w-6xl mx-auto px-5 lg:px-8">
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-4"
+            style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.25)', color: '#a78bfa' }}>
+            Why Aatra AI
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
+            Everything you need,<br />nothing you don't
+          </h2>
+          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+            A clean, fast AI chat experience — no bloat, no subscriptions, no tricks.
+          </p>
         </div>
-        <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
-          Everything you need
-        </h2>
-        <p className="text-lg text-gray-muted">
-          Powerful features designed for natural conversation
-        </p>
-      </div>
 
-      {/* Horizontal Scroll Track */}
-      <div className="relative h-[500px] md:h-[600px] overflow-hidden">
-        <div
-          ref={trackRef}
-          className="absolute top-0 left-0 h-full flex items-center gap-8 px-12 md:px-24"
-          style={{ width: 'max-content' }}
-        >
-          {features.map((feature, i) => (
-            <div
-              key={i}
-              className="feature-card w-[300px] md:w-[340px] min-h-[320px] flex flex-col"
-            >
-              {/* Icon */}
-              <div
-                className="w-12 h-12 rounded-full flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-105"
-                style={{ background: feature.iconBg }}
-              >
-                <feature.icon size={24} style={{ color: feature.iconColor }} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {features.map((f, i) => (
+            <div key={i}
+              className="group p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:border-opacity-40"
+              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 flex-shrink-0"
+                style={{ background: `${f.color}18`, border: `1px solid ${f.color}30` }}>
+                <f.icon size={20} style={{ color: f.color }} />
               </div>
-
-              {/* Content */}
-              <h3 className="text-xl md:text-2xl font-semibold text-white mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-base text-gray-muted leading-relaxed">
-                {feature.description}
-              </p>
-
-              {/* Decorative element */}
-              <div className="mt-auto pt-6">
-                <div
-                  className="w-full h-24 rounded-xl opacity-30"
-                  style={{
-                    background: `linear-gradient(135deg, ${feature.iconBg}, transparent)`,
-                  }}
-                />
-              </div>
+              <h3 className="text-white font-semibold mb-2">{f.title}</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
             </div>
           ))}
-
-          {/* Spacer for scroll */}
-          <div className="w-[100px] flex-shrink-0" />
         </div>
       </div>
     </section>
