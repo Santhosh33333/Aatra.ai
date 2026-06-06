@@ -4,14 +4,18 @@ import { BrowserRouter } from 'react-router'
 import { ClerkProvider } from '@clerk/clerk-react'
 import './index.css'
 import App from './App.tsx'
+import { logger } from './lib/logger'
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
+logger.info('[App] Initializing Astra AI Application', { env: import.meta.env.MODE })
+
 if (!PUBLISHABLE_KEY) {
-  console.warn('Clerk publishable key missing. Add VITE_CLERK_PUBLISHABLE_KEY to .env')
+  logger.warn('Clerk publishable key missing. Add VITE_CLERK_PUBLISHABLE_KEY to .env')
 }
 
 try {
+  logger.success('[App] Starting React application')
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <ClerkProvider
@@ -48,11 +52,12 @@ try {
       </ClerkProvider>
     </StrictMode>,
   )
+  logger.info('[App] React application rendered successfully')
 } catch (error) {
   const errorMsg = (error as Error).message
-  console.error('Error rendering app:', error)
+  logger.error('[App] Fatal error during app initialization', error)
   const root = document.getElementById('root')!
-  root.innerHTML = `<div style="color: #ffb340; padding: 20px; background: #080c18; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: monospace;">
+  root.innerHTML = `<div style="color: #ffb340; padding: 20px; background: #080c18; min-height: 100vh; display: flex; align-items: center; justify-center; font-family: monospace;">
     <div style="max-width: 600px; padding: 40px; background: rgba(255,255,255,0.05); border: 1px solid #ffb340; border-radius: 8px;">
       <h2 style="color: #ff6b6b; margin-bottom: 20px;">Astra App Error</h2>
       <pre style="color: #ffb340; font-size: 12px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;">${errorMsg}</pre>

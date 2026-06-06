@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router';
+import { lazy, Suspense, useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router';
 import { useAuth } from '@clerk/clerk-react';
 import Navigation from './sections/Navigation';
 import Hero from './sections/Hero';
@@ -7,6 +7,7 @@ import Pricing from './sections/Pricing';
 import Footer from './sections/Footer';
 import ChatWidget from './sections/ChatWidget';
 import CursorGlow from './sections/CursorGlow';
+import { logger } from './lib/logger';
 
 // Lazy load heavy animated sections
 const ShowOff = lazy(() => import('./sections/ShowOff'));
@@ -51,6 +52,12 @@ function HomePage() {
 }
 
 export default function App() {
+  const location = useLocation();
+
+  useEffect(() => {
+    logger.info('[Navigation] Route changed', { path: location.pathname });
+  }, [location.pathname]);
+
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
