@@ -5,7 +5,7 @@ import { loadSettings, getUsageToday } from '../lib/adminStore';
 import { logger } from '../lib/logger';
 import {
   MessageCircle, Sparkles, LogOut, Settings, Crown,
-  TrendingUp, Zap, User, ChevronRight, Mail, Star
+  TrendingUp, Zap, User, ChevronRight, Mail, Star, Lock
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -54,10 +54,10 @@ export default function Dashboard() {
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1">
           {[
-            { icon: MessageCircle, label: 'Chat', active: true },
-            { icon: TrendingUp, label: 'Usage', active: false },
-            { icon: User, label: 'Profile', active: false },
-            { icon: Settings, label: 'Settings', active: false },
+            { icon: MessageCircle, label: 'Chat', active: true, href: '#' },
+            { icon: TrendingUp, label: 'Usage', active: false, href: '#' },
+            { icon: User, label: 'Profile', active: false, href: '#' },
+            { icon: Settings, label: 'Settings', active: false, href: '#' },
           ].map(item => (
             <button key={item.label}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
@@ -69,6 +69,24 @@ export default function Dashboard() {
               {item.label}
             </button>
           ))}
+          
+          {/* Separator */}
+          <div className="my-2 border-t border-white/8" />
+          
+          {/* Admin Section */}
+          <div className="text-xs text-gray-600 px-3 py-2 font-semibold uppercase tracking-wider">Admin</div>
+          <Link to="/admin"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-white hover:bg-white/5 transition-all group">
+            <Lock size={16} />
+            <span>Admin Panel</span>
+            <ChevronRight size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+          </Link>
+          <Link to="/admin-gateways"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-white hover:bg-white/5 transition-all group">
+            <Zap size={16} />
+            <span>Payment Gateways</span>
+            <ChevronRight size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+          </Link>
         </nav>
 
         {/* Usage card in sidebar */}
