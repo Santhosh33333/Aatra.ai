@@ -8,15 +8,11 @@ import App from './App.tsx'
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
 if (!PUBLISHABLE_KEY) {
-  console.warn('[v0] Clerk publishable key missing. Add VITE_CLERK_PUBLISHABLE_KEY to .env')
+  console.warn('Clerk publishable key missing. Add VITE_CLERK_PUBLISHABLE_KEY to .env')
 }
 
 try {
-  console.log('[v0] Starting React app...')
-  const root = document.getElementById('root')!
-  console.log('[v0] Root element:', root)
-  
-  createRoot(root).render(
+  createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <ClerkProvider
         publishableKey={PUBLISHABLE_KEY || 'pk_test_placeholder'}
@@ -52,10 +48,9 @@ try {
       </ClerkProvider>
     </StrictMode>,
   )
-  console.log('[v0] React app rendered successfully')
 } catch (error) {
   const errorMsg = (error as Error).message
-  console.error('[v0] Error rendering app:', error)
+  console.error('Error rendering app:', error)
   const root = document.getElementById('root')!
   root.innerHTML = `<div style="color: #ffb340; padding: 20px; background: #080c18; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: monospace;">
     <div style="max-width: 600px; padding: 40px; background: rgba(255,255,255,0.05); border: 1px solid #ffb340; border-radius: 8px;">

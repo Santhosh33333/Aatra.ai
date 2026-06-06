@@ -1,8 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router';
 import { useAuth } from '@clerk/clerk-react';
-
-console.log('[v0] App component rendering')
+import Navigation from './sections/Navigation';
+import Hero from './sections/Hero';
+import ShowOff from './sections/ShowOff';
+import Proof from './sections/Proof';
+import Features from './sections/Features';
+import Pricing from './sections/Pricing';
+import Footer from './sections/Footer';
+import ChatWidget from './sections/ChatWidget';
+import CursorGlow from './sections/CursorGlow';
+import AdminPanel from './pages/AdminPanel';
+import SignInPage from './pages/SignInPage';
+import SignUpPage from './pages/SignUpPage';
+import Dashboard from './pages/Dashboard';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isSignedIn, isLoaded } = useAuth();
@@ -16,22 +27,34 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function HomePage() {
   return (
-    <div className="min-h-screen bg-[#080c18] text-white flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Astra AI</h1>
-        <p className="text-gray-400 mb-8">Welcome to Astra</p>
-        <p className="text-sm text-gray-500">[v0] App is loading...</p>
-      </div>
+    <div className="relative min-h-screen bg-[#080c18] text-white overflow-x-hidden">
+      <CursorGlow />
+      <Navigation />
+      <main>
+        <Hero />
+        <ShowOff />
+        <Proof />
+        <Features />
+        <Pricing />
+      </main>
+      <Footer />
+      <ChatWidget />
     </div>
   );
 }
 
 export default function App() {
-  console.log('[v0] App component mounted')
-  
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/sign-in" element={<SignInPage />} />
+      <Route path="/sign-up" element={<SignUpPage />} />
+      <Route path="/dashboard" element={
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin" element={<AdminPanel />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
