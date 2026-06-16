@@ -51,7 +51,7 @@ export default function Checkout() {
       }
 
       console.log('[v0] Redirecting to payment gateway:', selectedGateway);
-      window.location.href = paymentData.payment_url;
+      window.location.assign(paymentData.payment_url);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Payment error occurred');
       console.error('[v0] Checkout error:', err);

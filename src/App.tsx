@@ -1,17 +1,17 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router';
 import { useAuth } from '@clerk/clerk-react';
-import Navigation from './sections/Navigation';
 import Hero from './sections/Hero';
-import Pricing from './sections/Pricing';
+import BrandShowcase from './sections/BrandShowcase';
+import Features from './sections/Features';
+import ShowOff from './sections/ShowOff';
+import Proof from './sections/Proof';
 import Footer from './sections/Footer';
 import ChatWidget from './sections/ChatWidget';
 import CursorGlow from './sections/CursorGlow';
 
-// Lazy load heavy animated sections
-const ShowOff = lazy(() => import('./sections/ShowOff'));
-const Proof = lazy(() => import('./sections/Proof'));
-const Features = lazy(() => import('./sections/Features'));
+const Navigation = lazy(() => import('./sections/Navigation'));
+const Pricing = lazy(() => import('./sections/Pricing'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const AdminGateways = lazy(() => import('./pages/admin-gateways'));
 const SignInPage = lazy(() => import('./pages/SignInPage'));
@@ -20,29 +20,34 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const Contact = lazy(() => import('./pages/Contact'));
 
+const Spin = () => (
+  <div className="min-h-screen flex items-center justify-center" style={{ background: '#08060f' }}>
+    <div className="w-8 h-8 rounded-full border-2 border-violet-500 border-t-transparent animate-spin" />
+  </div>
+);
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isSignedIn, isLoaded } = useAuth();
-  if (!isLoaded) return (
-    <div className="min-h-screen bg-[#080c18] flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
-    </div>
-  );
+  if (!isLoaded) return <Spin />;
   return isSignedIn ? <>{children}</> : <Navigate to="/sign-in" replace />;
 }
 
 function HomePage() {
   return (
-    <div className="relative min-h-screen bg-[#080c18] text-white overflow-x-hidden">
+    <div className="relative min-h-screen overflow-x-hidden" style={{ background: '#08060f' }}>
       <CursorGlow />
-      <Navigation />
+      <Suspense fallback={<div className="h-16" />}>
+        <Navigation />
+      </Suspense>
       <main>
         <Hero />
-        <Suspense fallback={<div className="h-96 bg-[#080c18]" />}>
-          <ShowOff />
-          <Proof />
-          <Features />
+        <BrandShowcase />
+        <Features />
+        <ShowOff />
+        <Proof />
+        <Suspense fallback={<div className="h-96" />}>
+          <Pricing />
         </Suspense>
-        <Pricing />
       </main>
       <Footer />
       <ChatWidget />
@@ -54,43 +59,17 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/sign-in" element={
-        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
-          <SignInPage />
-        </Suspense>
-      } />
-      <Route path="/sign-up" element={
-        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
-          <SignUpPage />
-        </Suspense>
-      } />
+      <Route path="/sign-in" element={<Suspense fallback={<Spin />}><SignInPage /></Suspense>} />
+      <Route path="/sign-up" element={<Suspense fallback={<Spin />}><SignUpPage /></Suspense>} />
       <Route path="/dashboard" element={
         <ProtectedRoute>
-          <Suspense fallback={<div className="min-h-screen bg-[#080c18] flex items-center justify-center"><div className="w-8 h-8 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" /></div>}>
-            <Dashboard />
-          </Suspense>
+          <Suspense fallback={<Spin />}><Dashboard /></Suspense>
         </ProtectedRoute>
       } />
-      <Route path="/admin" element={
-        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
-          <AdminPanel />
-        </Suspense>
-      } />
-      <Route path="/admin-gateways" element={
-        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
-          <AdminGateways />
-        </Suspense>
-      } />
-      <Route path="/checkout" element={
-        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
-          <Checkout />
-        </Suspense>
-      } />
-      <Route path="/contact" element={
-        <Suspense fallback={<div className="min-h-screen bg-[#080c18]" />}>
-          <Contact />
-        </Suspense>
-      } />
+      <Route path="/admin" element={<Suspense fallback={<Spin />}><AdminPanel /></Suspense>} />
+      <Route path="/admin-gateways" element={<Suspense fallback={<Spin />}><AdminGateways /></Suspense>} />
+      <Route path="/checkout" element={<Suspense fallback={<Spin />}><Checkout /></Suspense>} />
+      <Route path="/contact" element={<Suspense fallback={<Spin />}><Contact /></Suspense>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

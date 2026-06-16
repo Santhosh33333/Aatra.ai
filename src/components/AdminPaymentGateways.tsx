@@ -114,7 +114,16 @@ export default function AdminPaymentGateways() {
                     : 'bg-slate-700/50 border-slate-600 text-gray-300 hover:border-slate-500'
                 }`}
               >
-                <img src={logoPath} alt={g.name} className="w-12 h-12 mb-2 rounded" />
+                <img 
+                  src={logoPath} 
+                  alt={g.name} 
+                  className="w-12 h-12 mb-2 rounded" 
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    img.src = `data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22%3E%3Crect fill=%22%232c3e50%22 width=%2248%22 height=%2248%22 rx=%224%22/%3E%3Ctext x=%2224%22 y=%2224%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22%2388a5d8%22 font-family=%22Arial%22%3E${g.name[0]}%3C/text%3E%3C/svg%3E`;
+                  }}
+                  loading="lazy"
+                />
                 <div className="font-semibold text-center">{g.name}</div>
                 <div className="text-xs mt-2 opacity-75 text-center">{g.description.substring(0, 35)}...</div>
               </button>

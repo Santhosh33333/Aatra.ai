@@ -1,7 +1,14 @@
 declare global {
   interface Window {
-    Razorpay: any;
+    Razorpay: unknown;
   }
+}
+
+export interface RazorpayResponse {
+  razorpay_payment_id?: string
+  razorpay_order_id?: string
+  razorpay_signature?: string
+  [key: string]: unknown
 }
 
 export interface RazorpayOptions {
@@ -11,7 +18,7 @@ export interface RazorpayOptions {
   name: string;
   description: string;
   order_id: string;
-  handler: (response: any) => void;
+  handler: (response: RazorpayResponse) => void;
   prefill?: {
     name: string;
     email: string;

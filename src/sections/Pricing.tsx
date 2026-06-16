@@ -1,203 +1,112 @@
-import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Check } from 'lucide-react';
-
-gsap.registerPlugin(ScrollTrigger);
-
+import { Check, Sparkles, Zap, Crown } from 'lucide-react';
 
 const plans = [
   {
-    name: 'Mini',
-    price: '₹0',
-    period: '/month',
-    description: 'Perfect for getting started',
-    featured: false,
-    features: [
-      '20 messages per day',
-      'Basic AI responses',
-      '1 custom theme',
-      'Text chat only',
-    ],
-    cta: 'Get Started Free',
-    ctaStyle: 'secondary' as const,
-    action: 'signup',
-    subject: '',
+    name: 'Free', price: '₹0', period: '/month',
+    desc: 'Perfect to start — no card needed',
+    icon: Sparkles, color: '#10b981',
+    features: ['30 messages per day', 'Gemini 2.0 Flash', 'Full chat history', 'File attachments', 'No credit card ever'],
+    cta: 'Start Free Now', primary: false, action: 'signup',
   },
   {
-    name: 'Pro',
-    price: '₹900',
-    period: '/month',
-    description: 'Best for daily chatters',
-    featured: true,
-    features: [
-      'Unlimited messages',
-      'Advanced AI with memory',
-      'All custom themes',
-      'Voice messages',
-      'Priority support',
-    ],
-    cta: 'Upgrade to Pro',
-    ctaStyle: 'primary' as const,
-    action: 'contact',
-    subject: 'Pro Plan - Upgrade Request',
+    name: 'Pro', price: '₹799', period: '/month',
+    desc: 'Unlimited power for serious users',
+    icon: Zap, color: '#7c3aed',
+    features: ['Unlimited messages', 'Gemini 1.5 Pro', 'Priority speed', 'Advanced reasoning', 'Priority support'],
+    cta: 'Upgrade to Pro', primary: true, action: 'contact',
   },
   {
-    name: 'Ultra',
-    price: '₹1,900',
-    period: '/month',
-    description: 'For power users',
-    featured: false,
-    features: [
-      'Everything in Pro',
-      'Custom AI training',
-      'API access',
-      'Team collaboration',
-      'Dedicated support',
-    ],
-    cta: 'Go Ultra',
-    ctaStyle: 'secondary' as const,
-    action: 'contact',
-    subject: 'Ultra Plan - Upgrade Request',
+    name: 'Ultra', price: '₹1,799', period: '/month',
+    desc: 'Maximum intelligence + API access',
+    icon: Crown, color: '#f59e0b',
+    features: ['Everything in Pro', 'Gemini Ultra model', 'API access', '5 team seats', 'Dedicated support'],
+    cta: 'Go Ultra', primary: false, action: 'contact',
   },
 ];
 
 export default function Pricing() {
   const navigate = useNavigate();
-  const sectionRef = useRef<HTMLElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  const handleClick = (plan: typeof plans[0]) => {
-    if (plan.action === 'signup') {
-      navigate('/sign-up');
-    } else if (plan.action === 'contact') {
-      navigate(`/checkout?plan=${plan.name.toLowerCase()}`);
-    }
+  const handleClick = (action: string, name: string) => {
+    if (action === 'signup') navigate('/sign-up');
+    else navigate(`/checkout?plan=${name.toLowerCase()}`);
   };
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headerRef.current?.children || [],
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: headerRef.current,
-            start: 'top 80%',
-          },
-        }
-      );
-
-      cardsRef.current.forEach((card, i) => {
-        if (card) {
-          gsap.fromTo(
-            card,
-            { opacity: 0, y: 40, scale: 0.95 },
-            {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              duration: 0.8,
-              delay: i * 0.15,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: 'top 60%',
-              },
-            }
-          );
-        }
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section
-      ref={sectionRef}
-      id="pricing"
-      className="relative w-full py-32 md:py-40 bg-gradient-to-b from-navy to-[#1e2332]"
-    >
-      <div className="relative z-10 max-w-[1000px] mx-auto px-6 lg:px-12">
-        {/* Section Header */}
-        <div ref={headerRef} className="text-center mb-16">
-          <div className="text-xs font-medium text-gray-muted uppercase tracking-[3px] mb-4 opacity-0">
-            PRICING
+    <section id="pricing" className="w-full py-24" style={{ background: '#08060f' }}>
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-8"
+          style={{ background: 'radial-gradient(circle,#7c3aed,transparent 70%)' }} />
+      </div>
+
+      <div className="relative max-w-5xl mx-auto px-5 lg:px-8">
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-4"
+            style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', color: '#34d399' }}>
+            Free plan included — always
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 opacity-0">
-            Choose your plan
-          </h2>
-          <p className="text-lg text-gray-muted opacity-0">
-            Start free, upgrade when you're ready
-          </p>
+          <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">Simple, honest pricing</h2>
+          <p className="text-gray-400 text-lg">Start free with Gemini Flash. Upgrade when you're ready.</p>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {plans.map((plan, i) => (
-            <div
-              key={i}
-              ref={(el) => { cardsRef.current[i] = el; }}
-              className={`relative pricing-card ${
-                plan.featured ? 'pricing-card-featured' : ''
-              } opacity-0 hover:-translate-y-1 transition-transform duration-300`}
-            >
-              {/* Featured Badge */}
-              {plan.featured && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-navy border border-amber text-amber text-[11px] font-semibold px-4 py-1 rounded-full">
-                    MOST POPULAR
-                  </span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {plans.map((p, i) => (
+            <div key={i}
+              className="relative rounded-3xl p-7 flex flex-col transition-all hover:-translate-y-1"
+              style={{
+                background: p.primary ? 'linear-gradient(145deg,rgba(124,58,237,0.14),rgba(16,185,129,0.07))' : 'rgba(255,255,255,0.03)',
+                border: p.primary ? '1px solid rgba(124,58,237,0.4)' : '1px solid rgba(255,255,255,0.07)',
+                boxShadow: p.primary ? '0 0 40px rgba(124,58,237,0.12)' : 'none',
+              }}>
+              {p.primary && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-0.5 rounded-full text-[11px] font-bold text-white"
+                  style={{ background: 'linear-gradient(135deg,#7c3aed,#10b981)' }}>
+                  MOST POPULAR
                 </div>
               )}
 
-              {/* Plan Name */}
-              <h3 className="text-xl font-semibold text-white mt-2">{plan.name}</h3>
-
-              {/* Price */}
-              <div className="flex items-baseline mt-4">
-                <span className="text-5xl md:text-6xl font-bold text-white">{plan.price}</span>
-                <span className="text-sm text-gray-muted ml-1">{plan.period}</span>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                  style={{ background: `${p.color}18`, border: `1px solid ${p.color}35` }}>
+                  <p.icon size={18} style={{ color: p.color }} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white">Aatra {p.name}</h3>
+                  <p className="text-xs text-gray-500">{p.desc}</p>
+                </div>
               </div>
 
-              {/* Description */}
-              <p className="text-sm text-gray-muted mt-2">{plan.description}</p>
+              <div className="flex items-baseline gap-1 mb-5">
+                <span className="text-4xl font-extrabold text-white">{p.price}</span>
+                <span className="text-sm text-gray-500">{p.period}</span>
+              </div>
 
-              {/* Divider */}
-              <div className="w-full h-px bg-white/10 my-6" />
+              <div className="h-px mb-5" style={{ background: 'rgba(255,255,255,0.07)' }} />
 
-              {/* Features */}
-              <ul className="space-y-3">
-                {plan.features.map((feature, j) => (
-                  <li key={j} className="flex items-center gap-3">
-                    <Check size={16} className="text-green-400 flex-shrink-0" />
-                    <span className="text-sm text-white">{feature}</span>
+              <ul className="space-y-2.5 mb-7 flex-1">
+                {p.features.map((f, j) => (
+                  <li key={j} className="flex items-center gap-2.5 text-sm text-gray-300">
+                    <Check size={14} style={{ color: p.color }} className="flex-shrink-0" />
+                    {f}
                   </li>
                 ))}
               </ul>
 
-              {/* CTA Button */}
-              <button
-                onClick={() => handleClick(plan)}
-                className={`w-full mt-8 py-3 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer ${
-                  plan.ctaStyle === 'primary'
-                    ? 'bg-amber text-navy hover:bg-amber-light hover:scale-[1.02] active:scale-[0.98]'
-                    : 'bg-white/10 text-white border border-white/20 hover:bg-white/[0.15] hover:border-white/30 hover:scale-[1.02] active:scale-[0.98]'
-                }`}
-              >
-                {plan.cta}
+              <button onClick={() => handleClick(p.action, p.name)}
+                className="w-full py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-[1.02]"
+                style={p.primary
+                  ? { background: 'linear-gradient(135deg,#7c3aed,#10b981)', color: '#fff' }
+                  : { background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.12)' }}>
+                {p.cta}
               </button>
             </div>
           ))}
         </div>
+
+        <p className="text-center text-sm text-gray-600 mt-10">
+          🎉 The free plan uses <span className="text-emerald-400 font-medium">Google Gemini 2.0 Flash</span> — the same model powering millions of developers. No catch.
+        </p>
       </div>
     </section>
   );

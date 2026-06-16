@@ -1,191 +1,58 @@
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Lock, Users, Globe } from 'lucide-react';
+import { Star } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
-
-const circularText = 'CONNECT WITH THE WORLD \u00B7 ';
-
-const floatingCards = [
-  {
-    icon: Lock,
-    title: 'End-to-End Encrypted',
-    description: 'Your conversations are private and secure',
-    position: 'top-left',
-    offset: { x: -120, y: -60 },
-  },
-  {
-    icon: Users,
-    title: '10M+ Users',
-    description: 'Join a global community',
-    position: 'top-right',
-    offset: { x: 80, y: -40 },
-  },
-  {
-    icon: Globe,
-    title: '50+ Languages',
-    description: 'Chat in your native tongue',
-    position: 'bottom-right',
-    offset: { x: 100, y: 60 },
-  },
+const testimonials = [
+  { name: 'Priya S.', role: 'Product Manager', avatar: 'P', text: 'I use Aatra every day for meeting summaries and emails. The free plan is genuinely useful — not crippled like other tools.', stars: 5 },
+  { name: 'Rahul M.', role: 'Software Engineer', avatar: 'R', text: 'The Gemini Flash integration is blazing fast. I debug code snippets here faster than opening docs. Highly recommend.', stars: 5 },
+  { name: 'Ananya K.', role: 'Content Creator', avatar: 'A', text: 'No sign-up friction, no paywalls hitting you every 5 messages. Just works. I love how clean and simple it is.', stars: 5 },
+  { name: 'Dev T.', role: 'Startup Founder', avatar: 'D', text: 'Using Aatra for brainstorming product ideas. The context memory is excellent — feels like talking to a smart colleague.', stars: 5 },
+  { name: 'Sneha R.', role: 'Student', avatar: 'S', text: 'As a student with no budget, 30 free messages per day is perfect. It helps me understand complex topics instantly.', stars: 5 },
+  { name: 'Karthik B.', role: 'Freelance Designer', avatar: 'K', text: 'I draft client proposals and creative briefs with Aatra. The quality of writing assistance is on par with premium tools.', stars: 5 },
 ];
 
 export default function Proof() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const circleRef = useRef<HTMLDivElement>(null);
-  const screenshotRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Circle entrance
-      gsap.fromTo(
-        circleRef.current,
-        { opacity: 0, scale: 0.8 },
-        {
-          opacity: 1,
-          scale: 1,
-          duration: 1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 70%',
-          },
-        }
-      );
-
-      // Screenshot entrance
-      gsap.fromTo(
-        screenshotRef.current,
-        { opacity: 0, y: 60 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          ease: 'power3.out',
-          delay: 0.3,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 70%',
-          },
-        }
-      );
-
-      // Floating cards entrance
-      cardsRef.current.forEach((card, i) => {
-        if (card) {
-          gsap.fromTo(
-            card,
-            { opacity: 0, x: floatingCards[i].offset.x > 0 ? 30 : -30, y: 20 },
-            {
-              opacity: 1,
-              x: 0,
-              y: 0,
-              duration: 0.8,
-              ease: 'power3.out',
-              delay: 0.5 + i * 0.2,
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: 'top 70%',
-              },
-            }
-          );
-        }
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full py-32 md:py-40 bg-navy-deep dot-pattern overflow-hidden"
-    >
-      <div className="relative z-10 max-w-[1200px] mx-auto px-6 lg:px-12 flex flex-col items-center">
-        {/* Circular Text */}
-        <div
-          ref={circleRef}
-          className="relative w-[320px] h-[320px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px] opacity-0"
-        >
-          {/* Rotating Text */}
-          <div className="absolute inset-0 animate-spin-slow">
-            <svg viewBox="0 0 500 500" className="w-full h-full">
-              <defs>
-                <path
-                  id="circlePath"
-                  d="M 250, 250 m -200, 0 a 200,200 0 1,1 400,0 a 200,200 0 1,1 -400,0"
-                  fill="none"
-                />
-              </defs>
-              <text
-                fill="white"
-                fontSize="28"
-                fontWeight="700"
-                letterSpacing="8"
-                textLength="1256"
-              >
-                <textPath href="#circlePath" startOffset="0%">
-                  {circularText.repeat(2)}
-                </textPath>
-              </text>
-            </svg>
+    <section className="w-full py-24" style={{ background: 'linear-gradient(180deg,#0a0f08,#08060f)' }}>
+      <div className="max-w-6xl mx-auto px-5 lg:px-8">
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-4"
+            style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', color: '#34d399' }}>
+            What users say
           </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
+            Loved by thousands
+          </h2>
+          <p className="text-gray-400 text-lg">Real feedback from real users across India and beyond.</p>
+        </div>
 
-          {/* Center Logo */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-amber to-cyan flex items-center justify-center shadow-glow-strong">
-              <img src="/app-logo.png" alt="Astra" className="w-10 h-10 md:w-14 md:h-14" />
-            </div>
-          </div>
-
-          {/* Floating Cards */}
-          {floatingCards.map((card, i) => (
-            <div
-              key={i}
-              ref={(el) => { cardsRef.current[i] = el; }}
-              className={`absolute hidden md:block liquid-glass rounded-2xl p-4 w-[180px] opacity-0 ${
-                i === 0 ? 'animate-float-1' : i === 1 ? 'animate-float-2' : 'animate-float-1'
-              }`}
-              style={{
-                ...(card.position === 'top-left' && { top: '15%', left: '-5%' }),
-                ...(card.position === 'top-right' && { top: '10%', right: '-5%' }),
-                ...(card.position === 'bottom-right' && { bottom: '15%', right: '-8%' }),
-                animationDelay: `${i * 1.5}s`,
-              }}
-            >
-              <card.icon size={16} className={i === 1 ? 'text-amber mb-2' : 'text-cyan mb-2'} />
-              <h4 className="text-sm font-semibold text-white mb-1">{card.title}</h4>
-              <p className="text-xs text-gray-muted">{card.description}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {testimonials.map((t, i) => (
+            <div key={i} className="p-5 rounded-2xl flex flex-col gap-3"
+              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div className="flex gap-0.5">
+                {Array(t.stars).fill(0).map((_, j) => (
+                  <Star key={j} size={13} className="fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+              <p className="text-sm text-gray-300 leading-relaxed flex-1">"{t.text}"</p>
+              <div className="flex items-center gap-3 pt-1">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                  style={{ background: 'linear-gradient(135deg,#7c3aed,#10b981)' }}>
+                  {t.avatar}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-white">{t.name}</p>
+                  <p className="text-xs text-gray-600">{t.role}</p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* App Screenshot */}
-        <div
-          ref={screenshotRef}
-          className="mt-16 md:mt-20 w-full max-w-[800px] opacity-0"
-        >
-          <img
-            src="/app-screenshot.jpg"
-            alt="Astra Chat App Interface"
-            className="w-full rounded-3xl border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.5)]"
-          />
-        </div>
-
-        {/* Mobile floating cards */}
-        <div className="flex flex-col md:hidden gap-4 mt-12 w-full max-w-[300px]">
-          {floatingCards.map((card, i) => (
-            <div
-              key={i}
-              className="liquid-glass rounded-2xl p-4"
-            >
-              <card.icon size={16} className={i === 1 ? 'text-amber mb-2' : 'text-cyan mb-2'} />
-              <h4 className="text-sm font-semibold text-white mb-1">{card.title}</h4>
-              <p className="text-xs text-gray-muted">{card.description}</p>
-            </div>
-          ))}
+        {/* Trust bar */}
+        <div className="mt-12 p-6 rounded-2xl text-center"
+          style={{ background: 'rgba(124,58,237,0.07)', border: '1px solid rgba(124,58,237,0.18)' }}>
+          <p className="text-2xl font-bold text-white mb-1">500,000+ users trust Aatra AI</p>
+          <p className="text-sm text-gray-500">Join the community — it's completely free to start.</p>
         </div>
       </div>
     </section>

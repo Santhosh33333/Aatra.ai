@@ -1,127 +1,46 @@
-import { useState, useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Twitter, Github, Linkedin, MessageCircle } from 'lucide-react';
+import { Link } from 'react-router';
+import { Sparkles, Twitter, Github, Linkedin } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
-
-const linkColumns = [
-  {
-    title: 'Product',
-    links: ['Features', 'Pricing', 'API', 'Integrations'],
-  },
-  {
-    title: 'Company',
-    links: ['About', 'Blog', 'Careers', 'Press'],
-  },
-  {
-    title: 'Resources',
-    links: ['Documentation', 'Help Center', 'Community', 'Contact'],
-  },
-  {
-    title: 'Legal',
-    links: ['Privacy', 'Terms', 'Security', 'Cookies'],
-  },
-];
-
-const socialIcons = [
-  { icon: Twitter, href: '#' },
-  { icon: Github, href: '#' },
-  { icon: MessageCircle, href: '#' },
-  { icon: Linkedin, href: '#' },
+const cols = [
+  { title: 'Product', links: [{ l: 'Features', h: '/#features' }, { l: 'Pricing', h: '/#pricing' }, { l: 'Dashboard', h: '/dashboard' }] },
+  { title: 'Company', links: [{ l: 'About', h: '/contact' }, { l: 'Blog', h: '/contact' }, { l: 'Careers', h: '/contact' }] },
+  { title: 'Support', links: [{ l: 'Contact', h: '/contact' }, { l: 'Help Center', h: '/contact' }, { l: 'Privacy', h: '/contact' }] },
 ];
 
 export default function Footer() {
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-  const footerRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        footerRef.current,
-        { opacity: 0 },
-        {
-          opacity: 1,
-          duration: 0.6,
-          scrollTrigger: {
-            trigger: footerRef.current,
-            start: 'top 90%',
-          },
-        }
-      );
-    }, footerRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email.includes('@')) {
-      setSubscribed(true);
-    }
-  };
-
   return (
-    <footer
-      ref={footerRef}
-      className="relative w-full bg-navy-deep border-t border-white/5 opacity-0"
-    >
-      <div className="max-w-[1200px] mx-auto px-6 lg:px-12 py-16 md:py-20">
-        {/* Top Row */}
-        <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-16">
+    <footer className="w-full pt-16 pb-8" style={{ background: '#06040c', borderTop: '1px solid rgba(124,58,237,0.12)' }}>
+      <div className="max-w-6xl mx-auto px-5 lg:px-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           {/* Brand */}
-          <div>
-            <a href="#" className="flex items-center gap-3 mb-3">
-              <img src="/app-logo.png" alt="Astra" className="w-6 h-6" />
-              <span className="text-white font-semibold text-base">Astra</span>
-            </a>
-            <p className="text-sm text-gray-muted">
-              AI-powered conversations that matter
-            </p>
+          <div className="col-span-2 md:col-span-1">
+            <Link to="/" className="flex items-center gap-2 mb-3 group">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform"
+                style={{ background: 'linear-gradient(135deg,#7c3aed,#10b981)' }}>
+                <Sparkles size={15} className="text-white" />
+              </div>
+              <span className="font-bold text-white">Aatra AI</span>
+            </Link>
+            <p className="text-sm text-gray-600 mb-4 leading-relaxed">Free AI chat powered by Google Gemini. No credit card, no tricks.</p>
+            <div className="flex gap-3">
+              {[Twitter, Github, Linkedin].map((Icon, i) => (
+                <a key={i} href="#"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-600 hover:text-white transition-colors"
+                  style={{ background: 'rgba(255,255,255,0.05)' }}>
+                  <Icon size={15} />
+                </a>
+              ))}
+            </div>
           </div>
 
-          {/* Newsletter */}
-          <div>
-            <p className="text-sm font-medium text-white mb-3">Stay updated</p>
-            {subscribed ? (
-              <p className="text-sm text-green-400">Thanks for subscribing!</p>
-            ) : (
-              <form onSubmit={handleSubscribe} className="flex gap-2">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-48 md:w-60 bg-white/5 border border-white/10 rounded-full px-4 py-2.5 text-sm text-white placeholder:text-gray-muted focus:outline-none focus:border-amber transition-colors"
-                />
-                <button
-                  type="submit"
-                  className="bg-amber text-navy px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-amber-light transition-colors"
-                >
-                  Subscribe
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-
-        {/* Link Columns */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
-          {linkColumns.map((column) => (
-            <div key={column.title}>
-              <h4 className="text-sm font-semibold text-white mb-4">
-                {column.title}
-              </h4>
+          {/* Link columns */}
+          {cols.map(col => (
+            <div key={col.title}>
+              <h4 className="text-sm font-semibold text-white mb-4">{col.title}</h4>
               <ul className="space-y-2.5">
-                {column.links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-sm text-gray-muted hover:text-white transition-colors duration-200"
-                    >
-                      {link}
-                    </a>
+                {col.links.map(({ l, h }) => (
+                  <li key={l}>
+                    <Link to={h} className="text-sm text-gray-600 hover:text-gray-300 transition-colors">{l}</Link>
                   </li>
                 ))}
               </ul>
@@ -129,24 +48,10 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Bottom Row */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-white/5">
-          <p className="text-xs text-gray-muted">
-            2026 Astra. All rights reserved.
-          </p>
-
-          {/* Social Icons */}
-          <div className="flex items-center gap-4">
-            {socialIcons.map((social, i) => (
-              <a
-                key={i}
-                href={social.href}
-                className="text-gray-muted hover:text-white hover:scale-110 transition-all duration-200"
-              >
-                <social.icon size={20} />
-              </a>
-            ))}
-          </div>
+        <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-3"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <p className="text-xs text-gray-700">© 2026 Aatra AI. All rights reserved.</p>
+          <p className="text-xs text-gray-700">Powered by <span className="text-emerald-700">Google Gemini</span></p>
         </div>
       </div>
     </footer>

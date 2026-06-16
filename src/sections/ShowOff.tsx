@@ -1,86 +1,87 @@
-import { useEffect, useRef, memo } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Check } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
-
-const chatMessages = [
-  { sender: 'ai', text: "Hello! I'm Astra, your AI companion." },
-  { sender: 'user', text: 'Can you help me brainstorm?' },
-  { sender: 'ai', text: "Of course! What topic would you like?" },
+const capabilities = [
+  'Write emails, reports, essays',
+  'Debug and explain code',
+  'Brainstorm ideas',
+  'Summarise long documents',
+  'Answer any question',
+  'Translate to 50+ languages',
 ];
 
-function ShowOff() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const phoneRef = useRef<HTMLDivElement>(null);
+const preview = [
+  { r: 'user', t: 'Summarise the key points of quantum computing' },
+  { r: 'ai', t: 'Quantum computing uses quantum bits (qubits) that can be in multiple states at once, enabling exponentially faster computation for specific problems like cryptography and drug discovery.' },
+  { r: 'user', t: 'Give me a real-world example' },
+  { r: 'ai', t: "Google's Sycamore processor solved in 200 seconds what would take the world's fastest supercomputer 10,000 years — demonstrating quantum supremacy." },
+];
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        phoneRef.current,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 80%',
-          },
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
+export default function ShowOff() {
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full py-24 md:py-32 bg-gradient-to-b from-navy to-navy-deep overflow-hidden"
-    >
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #00c8ff, transparent)' }} />
+    <section className="w-full py-24" style={{ background: 'linear-gradient(180deg,#08060f,#0a0f08)' }}>
+      <div className="max-w-6xl mx-auto px-5 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
-      <div className="relative z-10 max-w-[1200px] mx-auto px-6 lg:px-12">
-        <div className="flex flex-col md:flex-row items-center justify-center gap-12">
-          <div ref={phoneRef} className="relative opacity-0">
-            <div className="w-[260px] h-[480px] bg-navy-dark rounded-[40px] border border-white/10 overflow-hidden shadow-lg">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-6 bg-navy rounded-b-[16px] z-10" />
-              <div className="h-[48px] bg-navy-dark border-b border-white/5 flex items-center px-4 gap-2 mt-1">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber to-cyan" />
-                <div>
-                  <div className="text-xs font-semibold text-white">Astra</div>
-                  <div className="text-[9px] text-gray-400">Online</div>
-                </div>
-              </div>
-              <div className="p-3 space-y-2" style={{ height: 'calc(100% - 102px)' }}>
-                {chatMessages.map((msg, i) => (
-                  <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[75%] px-3 py-1.5 text-xs rounded-lg ${msg.sender === 'user' ? 'bg-amber-500/40 text-white' : 'bg-white/10 text-gray-300'}`}>
-                      {msg.text}
-                    </div>
-                  </div>
+          {/* Left — chat preview */}
+          <div className="rounded-3xl overflow-hidden"
+            style={{ background: '#0f0a1e', border: '1px solid rgba(124,58,237,0.25)', boxShadow: '0 24px 64px rgba(124,58,237,0.18)' }}>
+            <div className="px-5 py-3 flex items-center gap-2"
+              style={{ borderBottom: '1px solid rgba(124,58,237,0.15)', background: 'rgba(124,58,237,0.07)' }}>
+              <div className="flex gap-1.5">
+                {['#ef4444','#f59e0b','#10b981'].map(c => (
+                  <span key={c} className="w-2.5 h-2.5 rounded-full" style={{ background: c }} />
                 ))}
               </div>
-              <div className="h-[48px] bg-navy-dark border-t border-white/5 flex items-center px-3 gap-2">
-                <input type="text" placeholder="Type..." className="flex-1 bg-white/5 rounded-full px-3 py-1.5 text-xs placeholder:text-gray-500 border border-white/10" />
+              <span className="text-xs text-gray-500 ml-2">Aatra AI — conversation</span>
+            </div>
+            <div className="p-5 space-y-3 min-h-[260px]">
+              {preview.map((m, i) => (
+                <div key={i} className={`flex ${m.r === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className="max-w-[80%] px-4 py-3 rounded-2xl text-sm text-white leading-relaxed"
+                    style={m.r === 'user'
+                      ? { background: 'linear-gradient(135deg,#7c3aed,#6d28d9)' }
+                      : { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(124,58,237,0.18)' }}>
+                    {m.t}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="px-5 py-3 flex items-center gap-2"
+              style={{ borderTop: '1px solid rgba(124,58,237,0.15)', background: 'rgba(0,0,0,0.2)' }}>
+              <input readOnly placeholder="Ask anything..." className="flex-1 bg-transparent text-sm text-gray-500 focus:outline-none" />
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                style={{ background: 'linear-gradient(135deg,#7c3aed,#10b981)' }}>
+                <span className="text-white text-xs font-bold">→</span>
               </div>
             </div>
           </div>
 
-          <div className="text-center md:text-left">
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Smart Conversations</h3>
-            <p className="text-gray-400 mb-4">AI that understands context and emotions</p>
-            <div>
-              <div className="text-3xl font-bold text-amber">10M+</div>
-              <div className="text-sm text-gray-400">Active Users</div>
-            </div>
+          {/* Right — capabilities */}
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-widest text-emerald-400 mb-3">What can Aatra do?</div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Ask anything.<br />
+              <span style={{ background: 'linear-gradient(90deg,#a78bfa,#34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                Get instant answers.
+              </span>
+            </h2>
+            <p className="text-gray-400 mb-8 leading-relaxed">
+              From writing and coding to research and translation — Aatra AI handles it all, powered by Google Gemini 2.0 Flash.
+            </p>
+            <ul className="space-y-3">
+              {capabilities.map((c, i) => (
+                <li key={i} className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(52,211,153,0.15)', border: '1px solid rgba(52,211,153,0.3)' }}>
+                    <Check size={11} className="text-emerald-400" />
+                  </div>
+                  <span className="text-sm text-gray-300">{c}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
     </section>
   );
 }
-
-export default memo(ShowOff);
