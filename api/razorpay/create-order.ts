@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { Buffer } from 'node:buffer';
 
 const RAZORPAY_API_URL = 'https://api.razorpay.com/v1/';
 const KEY_ID = process.env.RAZORPAY_KEY_ID || '';
@@ -20,96 +20,99 @@ interface ErrorResponse {
   message?: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Record<string, unknown> | ErrorResponse>
-) {
+type RazorpayResponse = Record<string, unknown> | ErrorResponse;
+
+function jsonResponse(status: number, body: RazorpayResponse) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'content-type': 'application/json' },
+  });
+}
+
+function jsonError(status: number, error: string, details?: unknown) {
+  return jsonResponse(status, details ? { error, details } : { error });
+}
+
+async function readJson(req: Request): Promise<Record<string, unknown>> {
+  try {
+    return (await req.json()) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
+
+export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return jsonResponse(405, { error: 'Method not allowed' });
   }
 
   try {
-    const { planId, email, phone, amount, currency, description, purpose } = req.body as PaymentRequest;
+    const { planId, email, phone, amount, currency, description, purpose } = (await readJson(req)) as PaymentRequest;
 
     if (!email || !phone || !amount || !planId) {
-      return res.status(400).json({
-        error: 'Missing required fields',
-      });
+      return jsonResponse(400, { error: 'Missing required fields' });
     }
 
     console.log('[v0] Razorpay: Creating payment order:', { planId, email, phone, amount });
 
-    // Demo mode - no credentials
     if (!KEY_ID || !KEY_SECRET) {
       console.log('[v0] Razorpay: Demo mode - returning test order');
-      
-      const demoOrderId = `order_demo_${Date.now()}`;
-      const demoPaymentUrl = `https://checkout.razorpay.com/demo?order_id=${demoOrderId}&amount=${amount}&email=${email}&phone=${phone}`;
 
-      return res.status(200).json({
+      const demoOrderId = `order_demo_${Date.now()}`;
+      const demoPaymentUrl = `https://checkout.razorpay.com/demo?order_id=${demoOrderId}&amount=${amount}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`;
+
+      return jsonResponse(200, {
         success: true,
         mode: 'demo',
         order_id: demoOrderId,
         payment_url: demoPaymentUrl,
         key_id: 'rzp_test_demo',
-        amount: amount,
-        email: email,
+        amount,
+        email,
         message: 'Demo order created. Configure Razorpay credentials for production.',
       });
     }
 
-    // Production mode - create order with Razorpay API
     const orderData = {
-      amount: amount, // In paise
+      amount,
       currency: currency || 'INR',
       receipt: `receipt_${Date.now()}`,
       description: purpose || description || `Astra AI ${planId}`,
       customer_notify: 1,
-      notes: {
-        planId,
-        email,
-        phone,
-      },
+      notes: { planId, email, phone },
     };
 
-    // Razorpay API uses Basic Auth
     const auth = Buffer.from(`${KEY_ID}:${KEY_SECRET}`).toString('base64');
 
     const response = await fetch(`${RAZORPAY_API_URL}orders`, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${auth}`,
+        Authorization: `Basic ${auth}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(orderData),
     });
 
-    const data = await response.json();
+    const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
 
     if (!response.ok) {
       console.error('[v0] Razorpay API error:', data);
-      return res.status(response.status).json({
-        error: 'Failed to create order',
-        details: data,
-      });
+      return jsonError(response.status, 'Failed to create order', data);
     }
 
-    console.log('[v0] Razorpay: Order created:', (data as Record<string, unknown>).id);
+    console.log('[v0] Razorpay: Order created:', data.id);
 
-    return res.status(200).json({
+    return jsonResponse(200, {
       success: true,
       mode: 'production',
-      order_id: (data as Record<string, unknown>).id,
+      order_id: data.id,
       key_id: KEY_ID,
-      amount: (data as Record<string, unknown>).amount,
-      email: email,
+      amount: data.amount,
+      email,
       message: 'Order created successfully',
     });
   } catch (error) {
     console.error('[v0] Razorpay error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
+    return jsonError(500, 'Internal server error', error instanceof Error ? error.message : 'Unknown error');
   }
 }

@@ -1,10 +1,22 @@
-import { SignUp } from '@clerk/clerk-react';
-import { Link } from 'react-router';
+import { SignUp, useAuth } from '@clerk/clerk-react';
+import { Link, Navigate, useSearchParams } from 'react-router';
 import { Sparkles, Check } from 'lucide-react';
 
 const perks = ['30 free messages every day', 'Gemini 2.0 Flash — for free', 'No credit card ever', 'Upgrade anytime'];
 
 export default function SignUpPage() {
+  const { isSignedIn, isLoaded } = useAuth();
+  const [searchParams] = useSearchParams();
+  const referralCode = searchParams.get('ref') || undefined;
+
+  if (isLoaded && isSignedIn) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  if (!isLoaded) {
+    return <div className="min-h-screen flex items-center justify-center" style={{ background: '#08060f' }}><div className="w-8 h-8 rounded-full border-2 border-violet-500 border-t-transparent animate-spin" /></div>;
+  }
+
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#08060f' }}>
       <div className="fixed inset-0 pointer-events-none">
@@ -69,8 +81,16 @@ export default function SignUpPage() {
             <div className="text-center lg:text-left mb-6">
               <h1 className="text-2xl font-bold text-white mb-1">Create your account</h1>
               <p className="text-gray-500 text-sm">Free · No credit card required</p>
+              {referralCode && <p className="text-emerald-400 text-xs mt-2">Referral code applied: {referralCode}</p>}
             </div>
-            <SignUp signInUrl="/sign-in" forceRedirectUrl="/dashboard" />
+            <SignUp
+              routing="path"
+              path="/sign-up"
+              signInUrl="/sign-in"
+              forceRedirectUrl="/dashboard"
+              fallbackRedirectUrl="/dashboard"
+              unsafeMetadata={{ referralCode }}
+            />
           </div>
         </div>
       </div>

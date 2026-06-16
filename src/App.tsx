@@ -17,8 +17,10 @@ const AdminGateways = lazy(() => import('./pages/admin-gateways'));
 const SignInPage = lazy(() => import('./pages/SignInPage'));
 const SignUpPage = lazy(() => import('./pages/SignUpPage'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const MarketIntelligence = lazy(() => import('./pages/MarketIntelligence'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const Contact = lazy(() => import('./pages/Contact'));
+const ImageStudio = lazy(() => import('./pages/ImageStudio'));
 
 const Spin = () => (
   <div className="min-h-screen flex items-center justify-center" style={{ background: '#08060f' }}>
@@ -55,6 +57,21 @@ function HomePage() {
   );
 }
 
+function NotFound() {
+  return (
+    <div className="min-h-screen flex items-center justify-center px-6 text-center text-white" style={{ background: '#08060f' }}>
+      <div>
+        <p className="text-amber-400 font-semibold mb-3">404</p>
+        <h1 className="text-4xl font-bold mb-3">Page not found</h1>
+        <p className="text-gray-400 mb-6">The page you are looking for does not exist.</p>
+        <a href="/" className="inline-flex px-5 py-2.5 rounded-xl text-sm font-semibold text-[#080c18] bg-gradient-to-r from-amber-400 to-cyan-400 hover:opacity-90">
+          Back to home
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <Routes>
@@ -66,11 +83,29 @@ export default function App() {
           <Suspense fallback={<Spin />}><Dashboard /></Suspense>
         </ProtectedRoute>
       } />
-      <Route path="/admin" element={<Suspense fallback={<Spin />}><AdminPanel /></Suspense>} />
-      <Route path="/admin-gateways" element={<Suspense fallback={<Spin />}><AdminGateways /></Suspense>} />
+      <Route path="/market-intelligence" element={
+        <ProtectedRoute>
+          <Suspense fallback={<Spin />}><MarketIntelligence /></Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin" element={
+        <ProtectedRoute>
+          <Suspense fallback={<Spin />}><AdminPanel /></Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin-gateways" element={
+        <ProtectedRoute>
+          <Suspense fallback={<Spin />}><AdminGateways /></Suspense>
+        </ProtectedRoute>
+      } />
       <Route path="/checkout" element={<Suspense fallback={<Spin />}><Checkout /></Suspense>} />
       <Route path="/contact" element={<Suspense fallback={<Spin />}><Contact /></Suspense>} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/image-studio" element={
+        <ProtectedRoute>
+          <Suspense fallback={<Spin />}><ImageStudio /></Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

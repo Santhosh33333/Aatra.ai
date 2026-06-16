@@ -45,7 +45,7 @@ Features:
 **Admin Access:**
 ```
 Email: santhoshkrishna958@gmail.com
-Password: 300703S#s
+Password: Keep this in your secure deployment environment only.
 Path: /admin → Theme tab
 ```
 
@@ -179,7 +179,7 @@ Open browser console (F12) to see color-coded logs:
 
 ### Test Logo Upload
 1. Navigate to `/admin`
-2. Login: `santhoshkrishna958@gmail.com` / `300703S#s`
+2. Login: Use your configured admin email and secure password from your deployment environment.
 3. Click "Theme" tab
 4. Drag & drop logo or click "Select File"
 5. Check browser console for logging

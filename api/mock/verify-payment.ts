@@ -1,5 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 interface VerifyPaymentRequest {
   transactionId: string;
 }
@@ -9,44 +7,58 @@ interface ErrorResponse {
   message?: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Record<string, unknown> | ErrorResponse>
-) {
+type MockResponse = Record<string, unknown> | ErrorResponse;
+
+function jsonResponse(status: number, body: MockResponse) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'content-type': 'application/json' },
+  });
+}
+
+function jsonError(status: number, error: string, message?: string) {
+  return jsonResponse(status, message ? { error, message } : { error });
+}
+
+async function readJson(req: Request): Promise<Record<string, unknown>> {
+  try {
+    return (await req.json()) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
+
+export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return jsonResponse(405, { error: 'Method not allowed' });
   }
 
   try {
-    const { transactionId } = req.body as VerifyPaymentRequest;
+    const { transactionId } = (await readJson(req)) as VerifyPaymentRequest;
 
     if (!transactionId) {
-      return res.status(400).json({ error: 'Missing transactionId' });
+      return jsonResponse(400, { error: 'Missing transactionId' });
     }
 
     console.log('[v0] Mock Gateway: Verifying payment:', transactionId);
 
-    // Simulate payment verification
     const isSuccessful = !transactionId.includes('fail');
     const status = isSuccessful ? 'completed' : 'failed';
 
     console.log('[v0] Mock Gateway: Payment verified:', { transactionId, status });
 
-    return res.status(200).json({
+    return jsonResponse(200, {
       success: isSuccessful,
       mode: 'mock',
       gateway: 'mock',
       transaction_id: transactionId,
-      status: status,
+      status,
       amount: 900,
       email: 'test@mock.com',
       message: `Mock payment ${status}`,
     });
   } catch (error) {
     console.error('[v0] Mock Gateway verification error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
+    return jsonError(500, 'Internal server error', error instanceof Error ? error.message : 'Unknown error');
   }
 }

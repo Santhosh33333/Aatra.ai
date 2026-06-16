@@ -1,5 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { createHash } from 'crypto';
+import { createHash } from 'node:crypto';
 
 interface PaymentRequest {
   planId: string;
@@ -17,21 +16,42 @@ interface ErrorResponse {
   message?: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Record<string, unknown> | ErrorResponse>
-) {
+type PayuResponse = Record<string, unknown> | ErrorResponse;
+
+function jsonResponse(status: number, body: PayuResponse) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'content-type': 'application/json' },
+  });
+}
+
+function jsonError(status: number, error: string, details?: unknown) {
+  return jsonResponse(status, details ? { error, details } : { error });
+}
+
+async function readJson(req: Request): Promise<Record<string, unknown>> {
+  try {
+    return (await req.json()) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
+
+function getSiteOrigin() {
+  const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '';
+  return (vercelUrl || process.env.SITE_URL || 'http://localhost:5173').replace(/\/$/, '');
+}
+
+export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return jsonResponse(405, { error: 'Method not allowed' });
   }
 
   try {
-    const { planId, email, phone, amount } = req.body as PaymentRequest;
+    const { planId, email, phone, amount } = (await readJson(req)) as PaymentRequest;
 
     if (!email || !phone || !amount || !planId) {
-      return res.status(400).json({
-        error: 'Missing required fields',
-      });
+      return jsonResponse(400, { error: 'Missing required fields' });
     }
 
     console.log('[v0] PayU: Creating payment request:', { planId, email, phone, amount });
@@ -39,29 +59,25 @@ export default async function handler(
     const MERCHANT_KEY = process.env.PAYU_MERCHANT_KEY || '';
     const MERCHANT_SALT = process.env.PAYU_MERCHANT_SALT || '';
 
-    // Demo mode - no credentials
     if (!MERCHANT_KEY || !MERCHANT_SALT) {
       console.log('[v0] PayU: Demo mode - returning test payment URL');
-      
-      const txnId = `txn_demo_${Date.now()}`;
-      const demoPaymentUrl = `https://secure.payu.in/demo/payment?txnid=${txnId}&amount=${amount / 100}&email=${email}&phone=${phone}&productinfo=${planId}`;
 
-      return res.status(200).json({
+      const txnId = `txn_demo_${Date.now()}`;
+      const demoPaymentUrl = `https://secure.payu.in/demo/payment?txnid=${txnId}&amount=${amount / 100}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&productinfo=${encodeURIComponent(planId)}`;
+
+      return jsonResponse(200, {
         success: true,
         mode: 'demo',
         txn_id: txnId,
         payment_url: demoPaymentUrl,
-        amount: amount,
-        email: email,
+        amount,
+        email,
         message: 'Demo payment URL created. Configure PayU credentials for production.',
       });
     }
 
-    // Production mode - create payment with PayU
     const txnId = `txn_${Date.now()}`;
     const productInfo = `Astra AI ${planId}`;
-
-    // Generate hash for PayU
     const hashString = `${MERCHANT_KEY}|${txnId}|${amount / 100}|${productInfo}|${email}|${phone}|||||||||||${MERCHANT_SALT}`;
     const hash = createHash('sha512').update(hashString).digest('hex');
 
@@ -73,28 +89,25 @@ export default async function handler(
     params.append('firstname', email.split('@')[0]);
     params.append('email', email);
     params.append('phone', phone);
-    params.append('surl', `${process.env.VERCEL_URL || 'https://aatra-ai.vercel.app'}/api/payu/success`);
-    params.append('furl', `${process.env.VERCEL_URL || 'https://aatra-ai.vercel.app'}/api/payu/failure`);
+    params.append('surl', `${getSiteOrigin()}/api/payu/success`);
+    params.append('furl', `${getSiteOrigin()}/api/payu/failure`);
     params.append('hash', hash);
 
     const paymentUrl = `https://secure.payu.in/_payment?${params.toString()}`;
 
     console.log('[v0] PayU: Payment URL generated');
 
-    return res.status(200).json({
+    return jsonResponse(200, {
       success: true,
       mode: 'production',
       txn_id: txnId,
       payment_url: paymentUrl,
-      amount: amount,
-      email: email,
+      amount,
+      email,
       message: 'Payment URL created successfully',
     });
   } catch (error) {
     console.error('[v0] PayU error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
+    return jsonError(500, 'Internal server error', error instanceof Error ? error.message : 'Unknown error');
   }
 }

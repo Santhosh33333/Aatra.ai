@@ -5,7 +5,7 @@
 
 ## Admin Account
 - **Email**: santhoshkrishna958@gmail.com
-- **Password**: 300703S#s
+- **Password**: Use your secure admin password from your deployment environment.
 - **Dashboard**: https://aatra-ai.vercel.app/admin
 
 ## Getting Paid from Users

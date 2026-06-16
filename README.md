@@ -73,11 +73,10 @@ Your Clerk publishable key is already set. Now configure redirect URLs:
 
 Your admin panel is at: `https://yourdomain.com/admin`
 
-**Admin credentials:**
-- Email: `santhoshkrishna958@gmail.com`
-- Password: `300703S#s`
+**Admin access:**
+- Use the configured admin email and password from your secure deployment settings.
 
-> ⚠️ Change the password in `src/lib/adminConfig.ts` before going live!
+> ⚠️ Keep the admin password in your secure environment and do not commit real credentials.
 
 ---
 

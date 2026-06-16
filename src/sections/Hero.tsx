@@ -30,26 +30,26 @@ export default function Hero() {
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6"
             style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)', color: '#a78bfa' }}>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Powered by Google Gemini 2.0 Flash · Free
+            AI Stock Market & F&O Analysis Platform · Live Signals
           </div>
 
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.06] tracking-tight mb-5">
-            Your free<br />
+            Trade smarter with<br />
             <span style={{ background: 'linear-gradient(90deg,#a78bfa,#34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              AI assistant
+              AI stock, F&O & growth intelligence
             </span><br />
-            is here.
+            built for modern traders.
           </h1>
 
           <p className="text-lg text-gray-400 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-            Aatra AI gives you 30 free Gemini messages every day — no credit card, no limits on what you can ask.
+            Aatra AI now delivers live market analysis, AI recommendations, penny stock scans, F&O workflows, ShAI signals, growth ideas, and unlisted stock watchlists in one professional dashboard.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-10">
-            <button onClick={() => navigate('/sign-up')}
+            <button onClick={() => navigate('/admin')}
               className="flex items-center justify-center gap-2 px-7 py-4 rounded-2xl font-semibold text-white text-base transition-all hover:scale-105 active:scale-95"
               style={{ background: 'linear-gradient(135deg,#7c3aed,#10b981)', boxShadow: '0 8px 30px rgba(124,58,237,0.4)' }}>
-              Start Free <ArrowRight size={18} />
+              Open Admin Access <ArrowRight size={18} />
             </button>
             <button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
               className="flex items-center justify-center gap-2 px-7 py-4 rounded-2xl font-medium text-gray-300 text-base transition-all hover:bg-white/8 hover:text-white"
@@ -59,7 +59,7 @@ export default function Hero() {
           </div>
 
           <div className="flex items-center justify-center lg:justify-start gap-6 text-xs text-gray-600">
-            {['No credit card', 'Free forever plan', 'Gemini 2.0 Flash'].map(t => (
+            {['Live NSE/BSE insights', 'F&O + penny stock scans', 'Growth, ShAI & unlisted opportunities'].map(t => (
               <span key={t} className="flex items-center gap-1.5">
                 <span className="text-emerald-400">✓</span> {t}
               </span>

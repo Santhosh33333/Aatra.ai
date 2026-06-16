@@ -3,6 +3,7 @@ import { Check, Sparkles, Zap, Crown } from 'lucide-react';
 
 const plans = [
   {
+    id: 'mini',
     name: 'Free', price: '₹0', period: '/month',
     desc: 'Perfect to start — no card needed',
     icon: Sparkles, color: '#10b981',
@@ -10,27 +11,29 @@ const plans = [
     cta: 'Start Free Now', primary: false, action: 'signup',
   },
   {
+    id: 'pro',
     name: 'Pro', price: '₹799', period: '/month',
     desc: 'Unlimited power for serious users',
     icon: Zap, color: '#7c3aed',
     features: ['Unlimited messages', 'Gemini 1.5 Pro', 'Priority speed', 'Advanced reasoning', 'Priority support'],
-    cta: 'Upgrade to Pro', primary: true, action: 'contact',
+    cta: 'Upgrade to Pro', primary: true, action: 'checkout',
   },
   {
+    id: 'ultra',
     name: 'Ultra', price: '₹1,799', period: '/month',
     desc: 'Maximum intelligence + API access',
     icon: Crown, color: '#f59e0b',
     features: ['Everything in Pro', 'Gemini Ultra model', 'API access', '5 team seats', 'Dedicated support'],
-    cta: 'Go Ultra', primary: false, action: 'contact',
+    cta: 'Go Ultra', primary: false, action: 'checkout',
   },
 ];
 
 export default function Pricing() {
   const navigate = useNavigate();
 
-  const handleClick = (action: string, name: string) => {
+  const handleClick = (action: string, planId: string) => {
     if (action === 'signup') navigate('/sign-up');
-    else navigate(`/checkout?plan=${name.toLowerCase()}`);
+    else navigate(`/checkout?plan=${planId}`);
   };
 
   return (
@@ -93,7 +96,7 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              <button onClick={() => handleClick(p.action, p.name)}
+              <button onClick={() => handleClick(p.action, p.id)}
                 className="w-full py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-[1.02]"
                 style={p.primary
                   ? { background: 'linear-gradient(135deg,#7c3aed,#10b981)', color: '#fff' }

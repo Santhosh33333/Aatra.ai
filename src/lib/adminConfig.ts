@@ -1,7 +1,7 @@
-// Admin configuration
-// Password stored as SHA-256 hex (not reversible). Current password: 300703S#s
-const ADMIN_EMAIL = 'santhoshkrishna958@gmail.com';
-const ADMIN_PASSWORD_HASH = '3beb818968fa53e9e9c14432c9ff40cdb15d0479c0f7fb44b9e7c2e2e44f2259';
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || '';
+const ADMIN_PASSWORD_HASH = import.meta.env.VITE_ADMIN_PASSWORD_HASH || '';
+
+export const adminConfigured = Boolean(ADMIN_EMAIL && ADMIN_PASSWORD_HASH);
 
 async function sha256hex(str: string): Promise<string> {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
@@ -9,6 +9,7 @@ async function sha256hex(str: string): Promise<string> {
 }
 
 export const verifyAdmin = async (email: string, password: string): Promise<boolean> => {
+  if (!adminConfigured) return false;
   if (email !== ADMIN_EMAIL) return false;
   return (await sha256hex(password)) === ADMIN_PASSWORD_HASH;
 };
@@ -24,7 +25,7 @@ export const DEFAULT_SETTINGS = {
     { id: 'gemini-1.5-pro', name: 'Aatra Pro', tier: 'pro', description: 'Gemini 1.5 Pro — advanced reasoning' },
     { id: 'gemini-1.5-ultra', name: 'Aatra Ultra', tier: 'ultra', description: 'Gemini Ultra — maximum intelligence' },
   ],
-  contactEmail: 'santhoshkrishna958@gmail.com',
+  contactEmail: ADMIN_EMAIL || 'admin@aatra.ai',
   upgradeMessage: "You've used your 30 free messages today! Upgrade for unlimited access.",
 };
 
@@ -32,4 +33,5 @@ export type AdminSettings = typeof DEFAULT_SETTINGS & {
   apiKey?: string;
   geminiApiKey?: string;
   theme?: 'dark' | 'light' | 'midnight' | 'forest';
+  logoUrl?: string;
 };

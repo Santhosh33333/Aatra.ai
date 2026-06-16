@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { verifyAdmin } from '../lib/adminConfig';
+import { adminConfigured, verifyAdmin } from '../lib/adminConfig';
 import { loadSettings, saveSettings } from '../lib/adminStore';
 import type { AdminSettings } from '../lib/adminConfig';
-import { Eye, EyeOff, Plus, Trash2, Save, LogOut, Settings, Key, Cpu, Mail, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Plus, Trash2, Save, LogOut, Settings, Key, Cpu, Mail, Sparkles, Palette, Upload } from 'lucide-react';
 
-type Tab = 'general' | 'api' | 'models' | 'contact';
+type Tab = 'general' | 'api' | 'models' | 'theme' | 'contact';
 type Tier = 'free' | 'pro' | 'ultra';
 
 export default function AdminPanel() {
@@ -19,6 +19,10 @@ export default function AdminPanel() {
   const [newModel, setNewModel] = useState({ id: '', name: '', tier: 'pro' as Tier, description: '' });
 
   const login = async () => {
+    if (!adminConfigured) {
+      setLoginError('Admin credentials are not configured. Add VITE_ADMIN_EMAIL and VITE_ADMIN_PASSWORD_HASH.');
+      return;
+    }
     if (await verifyAdmin(email, password)) { setAuthed(true); setLoginError(''); }
     else setLoginError('Invalid credentials.');
   };
@@ -78,6 +82,7 @@ export default function AdminPanel() {
     { id: 'general', label: 'General', icon: Settings },
     { id: 'api', label: 'API Keys', icon: Key },
     { id: 'models', label: 'Models', icon: Cpu },
+    { id: 'theme', label: 'Theme', icon: Palette },
     { id: 'contact', label: 'Contact', icon: Mail },
   ];
 
@@ -208,6 +213,39 @@ export default function AdminPanel() {
             </div>
           )}
 
+          {tab === 'theme' && (
+            <div className="space-y-5">
+              <h2 className="text-lg font-semibold">Theme Settings</h2>
+              <div className="space-y-4">
+                <LogoUploadSection settings={settings} setSettings={setSettings} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1.5 block">Primary Color</label>
+                  <input type="color" value={settings.primaryColor || '#7c3aed'}
+                    onChange={e => setSettings(p => ({ ...p, primaryColor: e.target.value }))}
+                    className="w-full h-10 rounded-xl bg-white/5 border border-white/10 cursor-pointer" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1.5 block">Accent Color</label>
+                  <input type="color" value={settings.accentColor || '#10b981'}
+                    onChange={e => setSettings(p => ({ ...p, accentColor: e.target.value }))}
+                    className="w-full h-10 rounded-xl bg-white/5 border border-white/10 cursor-pointer" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1.5 block">Theme Mode</label>
+                <select value={settings.theme || 'dark'} onChange={e => setSettings(p => ({ ...p, theme: e.target.value as 'dark' | 'light' | 'midnight' | 'forest' }))}
+                  className={inp}>
+                  <option value="dark">Dark</option>
+                  <option value="midnight">Midnight</option>
+                  <option value="forest">Forest</option>
+                  <option value="light">Light</option>
+                </select>
+              </div>
+            </div>
+          )}
+
           {tab === 'contact' && (
             <div className="space-y-5">
               <h2 className="text-lg font-semibold">Contact Settings</h2>
@@ -218,10 +256,80 @@ export default function AdminPanel() {
                   className={inp} />
                 <p className="text-xs text-gray-600 mt-1">Users who hit their limit see a button to email you for upgrade.</p>
               </div>
-            </div>
+</div>
+          )}
+         </div>
+       </div>
+     </div>
+   );
+}
+
+function LogoUploadSection({ settings, setSettings }: { settings: AdminSettings; setSettings: (s: AdminSettings) => void }) {
+  const [logoPreview, setLogoPreview] = useState<string | null>(settings.logoUrl || null);
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadStatus('error');
+      setErrorMessage('File too large. Max 5MB.');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setUploadStatus('error');
+      setErrorMessage('Invalid file type. Use PNG or JPG.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const preview = reader.result as string;
+      setLogoPreview(preview);
+      setSettings({ ...settings, logoUrl: preview });
+      setUploadStatus('success');
+      setTimeout(() => setUploadStatus('idle'), 3000);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeLogo = () => {
+    setLogoPreview(null);
+    setSettings({ ...settings, logoUrl: undefined });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-4">
+        {logoPreview ? (
+          <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10">
+            <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />
+          </div>
+        ) : (
+          <div className="w-20 h-20 rounded-2xl flex items-center justify-center"
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px dashed rgba(124,58,237,0.3)' }}>
+            <Upload size={24} className="text-gray-600" />
+          </div>
+        )}
+        <div>
+          <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" id="logo-upload" />
+          <label htmlFor="logo-upload"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white cursor-pointer hover:opacity-90 transition-opacity"
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#10b981)' }}>
+            <Upload size={14} />Select File
+          </label>
+          {logoPreview && (
+            <button onClick={removeLogo} className="ml-2 px-3 py-2 rounded-xl text-xs text-gray-400 hover:text-white border border-white/10">
+              Remove
+            </button>
           )}
         </div>
       </div>
+      {uploadStatus === 'success' && <p className="text-emerald-400 text-xs">✓ Logo uploaded successfully</p>}
+      {uploadStatus === 'error' && <p className="text-red-400 text-xs">✗ {errorMessage}</p>}
     </div>
   );
 }

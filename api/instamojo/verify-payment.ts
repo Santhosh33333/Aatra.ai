@@ -1,8 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 const INSTAMOJO_API_URL = 'https://www.instamojo.com/api/1.1/';
-const CLIENT_ID = process.env.VITE_INSTAMOJO_CLIENT_ID || '';
-const CLIENT_SECRET = process.env.VITE_INSTAMOJO_CLIENT_SECRET || '';
+const CLIENT_ID = process.env.VITE_INSTAMOJO_CLIENT_ID || process.env.INSTAMOJO_CLIENT_ID || '';
+const CLIENT_SECRET = process.env.VITE_INSTAMOJO_CLIENT_SECRET || process.env.INSTAMOJO_CLIENT_SECRET || '';
 
 interface VerifyPaymentRequest {
   paymentId: string;
@@ -14,30 +12,44 @@ interface ErrorResponse {
   message?: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Record<string, unknown> | ErrorResponse>
-) {
-  // Only allow POST requests
+type VerifyResponse = Record<string, unknown> | ErrorResponse;
+
+function jsonResponse(status: number, body: VerifyResponse) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'content-type': 'application/json' },
+  });
+}
+
+function jsonError(status: number, error: string, details?: unknown) {
+  return jsonResponse(status, details ? { error, details } : { error });
+}
+
+async function readJson(req: Request): Promise<Record<string, unknown>> {
+  try {
+    return (await req.json()) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
+
+export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return jsonResponse(405, { error: 'Method not allowed' });
   }
 
   try {
-    const { paymentId } = req.body as VerifyPaymentRequest;
+    const { paymentId } = (await readJson(req)) as VerifyPaymentRequest;
 
     if (!paymentId) {
-      return res.status(400).json({
-        error: 'Missing paymentId',
-      });
+      return jsonResponse(400, { error: 'Missing paymentId' });
     }
 
     console.log('[v0] Verifying payment:', paymentId);
 
-    // In demo mode, return success
     if (!CLIENT_ID || !CLIENT_SECRET) {
       console.log('[v0] Demo mode: Returning success for payment verification');
-      return res.status(200).json({
+      return jsonResponse(200, {
         success: true,
         mode: 'demo',
         status: 'completed',
@@ -46,7 +58,6 @@ export default async function handler(
       });
     }
 
-    // Production: Verify with Instamojo API
     const response = await fetch(`${INSTAMOJO_API_URL}payments/${paymentId}/`, {
       method: 'GET',
       headers: {
@@ -55,35 +66,31 @@ export default async function handler(
       },
     });
 
-    const data = await response.json();
+    const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
 
     if (!response.ok) {
       console.error('[v0] Instamojo verification error:', data);
-      return res.status(response.status).json({
-        error: 'Payment verification failed',
-        details: data,
-      });
+      return jsonError(response.status, 'Payment verification failed', data);
     }
 
+    const payment = (data.payment || {}) as Record<string, unknown>;
+
     console.log('[v0] Payment verified:', {
-      id: (data as Record<string, Record<string, unknown>>).payment?.id,
-      status: (data as Record<string, Record<string, unknown>>).payment?.status,
-      amount: (data as Record<string, Record<string, unknown>>).payment?.amount,
+      id: payment.id,
+      status: payment.status,
+      amount: payment.amount,
     });
 
-    return res.status(200).json({
+    return jsonResponse(200, {
       success: true,
       mode: 'production',
-      status: (data as Record<string, Record<string, unknown>>).payment?.status,
-      payment_id: (data as Record<string, Record<string, unknown>>).payment?.id,
-      amount: (data as Record<string, Record<string, unknown>>).payment?.amount,
-      email: (data as Record<string, Record<string, unknown>>).payment?.buyer_email,
+      status: payment.status,
+      payment_id: payment.id,
+      amount: payment.amount,
+      email: payment.buyer_email,
     });
   } catch (error) {
     console.error('[v0] Error verifying payment:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
+    return jsonError(500, 'Internal server error', error instanceof Error ? error.message : 'Unknown error');
   }
 }

@@ -2,7 +2,7 @@ import { useUser, useClerk } from '@clerk/clerk-react';
 import { Link } from 'react-router';
 import { loadSettings, getUsageToday } from '../lib/adminStore';
 import ChatWidget from '../sections/ChatWidget';
-import { MessageCircle, Sparkles, LogOut, Crown, TrendingUp, Zap, Star, ChevronRight, Mail, Lock, Settings } from 'lucide-react';
+import { MessageCircle, Sparkles, LogOut, Crown, TrendingUp, Zap, Star, ChevronRight, Mail, Lock, Settings, BarChart3, Image } from 'lucide-react';
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -36,25 +36,49 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-0.5">
-          {[
-            { icon: MessageCircle, label: 'Chat', active: true },
-            { icon: TrendingUp, label: 'Usage', active: false },
-            { icon: Settings, label: 'Settings', active: false },
-          ].map(item => (
-            <button key={item.label}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
-              style={item.active
-                ? { background: 'rgba(124,58,237,0.15)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.22)' }
-                : { color: '#6b7280' }}>
-              <item.icon size={16} /> {item.label}
-            </button>
-          ))}
+<nav className="flex-1 px-3 py-4 space-y-0.5">
+           {[
+             { icon: MessageCircle, label: 'Chat', active: true },
+             { icon: BarChart3, label: 'Market Intelligence', to: '/market-intelligence' },
+             { icon: TrendingUp, label: 'Usage', active: false },
+             { icon: Settings, label: 'Settings', active: false },
+           ].map(item => (
+             item.to ? (
+               <Link key={item.label} to={item.to}
+                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
+                 style={{ color: '#e5e7eb' }}>
+                 <item.icon size={16} /> {item.label}
+               </Link>
+             ) : (
+               <button key={item.label}
+                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
+                 style={item.active
+                   ? { background: 'rgba(124,58,237,0.15)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.22)' }
+                   : { color: '#6b7280' }}>
+                 <item.icon size={16} /> {item.label}
+               </button>
+             )
+           ))}
 
-          <div className="pt-4 pb-1">
-            <p className="text-[10px] uppercase tracking-widest px-3 pb-1" style={{ color: '#374151' }}>Admin</p>
-          </div>
-          {[
+           <div className="pt-4 pb-1">
+             <p className="text-[11px] uppercase tracking-widest px-3 pb-1" style={{ color: '#374151' }}>User</p>
+           </div>
+           {[
+             { icon: Image, label: 'Image Studio', to: '/image-studio' },
+           ].map(item => (
+             <Link key={item.label} to={item.to}
+               className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all group"
+               style={{ color: '#6b7280' }}>
+               <item.icon size={16} />
+               <span>{item.label}</span>
+               <ChevronRight size={12} className="ml-auto opacity-0 group-hover:opacity-60 transition-opacity" />
+             </Link>
+           ))}
+
+           <div className="pt-4 pb-1">
+             <p className="text-[11px] uppercase tracking-widest px-3 pb-1" style={{ color: '#374151' }}>Admin</p>
+           </div>
+           {[
             { icon: Lock, label: 'Admin Panel', to: '/admin' },
             { icon: Zap, label: 'Gateways', to: '/admin-gateways' },
           ].map(item => (

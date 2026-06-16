@@ -30,9 +30,11 @@ jobs:
       - name: Build
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
-          VITE_OPENAI_API_KEY: ${{ secrets.VITE_OPENAI_API_KEY }}
-          VITE_DEFAULT_MODEL: ${{ secrets.VITE_DEFAULT_MODEL }}
-          VITE_DAILY_LIMIT: ${{ secrets.VITE_DAILY_LIMIT }}
+          VITE_ADMIN_EMAIL: ${{ secrets.VITE_ADMIN_EMAIL }}
+          VITE_ADMIN_PASSWORD_HASH: ${{ secrets.VITE_ADMIN_PASSWORD_HASH }}
+          VITE_INSTAMOJO_CLIENT_ID: ${{ secrets.VITE_INSTAMOJO_CLIENT_ID }}
+          VITE_INSTAMOJO_CLIENT_SECRET: ${{ secrets.VITE_INSTAMOJO_CLIENT_SECRET }}
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
         run: npm run build
 
       - name: Add 404.html for SPA routing

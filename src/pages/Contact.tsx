@@ -68,7 +68,7 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-navy to-[#1e2332] text-white pt-20">
+    <div className="min-h-screen text-white pt-20" style={{ background: '#08060f' }}>
       <div className="max-w-6xl mx-auto px-6 lg:px-12">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold mb-4">Get in Touch</h1>

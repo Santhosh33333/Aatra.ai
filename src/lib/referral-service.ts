@@ -1,8 +1,3 @@
-/**
- * Referral Service for Astra AI
- * Handles referral links, tracking, and automatic referral on signup
- */
-
 import { logger } from './logger';
 
 export interface ReferralUser {
@@ -16,26 +11,44 @@ export interface ReferralUser {
 
 class ReferralService {
   private referralStore: Map<string, ReferralUser> = new Map();
-  private referralCodeMap: Map<string, string> = new Map(); // Map code -> userId
+  private referralCodeMap: Map<string, string> = new Map();
+  private STORAGE_KEY = 'astra_referrals';
 
-  /**
-   * Generate unique referral code
-   */
+  constructor() {
+    this.load();
+  }
+
   private generateReferralCode(): string {
     const hash = Math.random().toString(36).substring(2, 8).toUpperCase();
     return `ASTRA${hash}`;
   }
 
-  /**
-   * Register a new user with referral
-   */
+  private load(): void {
+    try {
+      const stored = localStorage.getItem(this.STORAGE_KEY);
+      if (!stored) return;
+      const data = JSON.parse(stored) as ReferralUser[];
+      this.referralStore = new Map(data.map(user => [user.id, user]));
+      this.referralCodeMap = new Map(data.map(user => [user.referralCode, user.id]));
+    } catch (error) {
+      logger.warn('[Referral] Failed to load referral data', error);
+    }
+  }
+
+  private persist(): void {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(Array.from(this.referralStore.values())));
+    } catch (error) {
+      logger.warn('[Referral] Failed to persist referral data', error);
+    }
+  }
+
   registerUser(
     userId: string,
     email: string,
     referralCode?: string
   ): { success: boolean; message: string; referralCode?: string } {
     try {
-      // Check if user already registered
       if (this.referralStore.has(userId)) {
         logger.warn(`[Referral] User ${userId} already registered`);
         return {
@@ -49,7 +62,6 @@ class ReferralService {
       let referredBy: string | undefined = undefined;
       let referrerUser: ReferralUser | undefined = undefined;
 
-      // Process referral code if provided
       if (referralCode) {
         const referrerId = this.referralCodeMap.get(referralCode);
         if (referrerId) {
@@ -75,6 +87,7 @@ class ReferralService {
 
       this.referralStore.set(userId, newUser);
       this.referralCodeMap.set(newReferralCode, userId);
+      this.persist();
 
       logger.success(`[Referral] User ${userId} registered`, {
         referralCode: newReferralCode,
@@ -95,26 +108,17 @@ class ReferralService {
     }
   }
 
-  /**
-   * Get referral code for user
-   */
   getReferralCode(userId: string): string | null {
     const user = this.referralStore.get(userId);
     return user?.referralCode || null;
   }
 
-  /**
-   * Get referral link
-   */
   getReferralLink(userId: string, baseURL: string = window.location.origin): string | null {
     const code = this.getReferralCode(userId);
     if (!code) return null;
     return `${baseURL}/sign-up?ref=${code}`;
   }
 
-  /**
-   * Get referral statistics for user
-   */
   getReferralStats(userId: string): {
     referralCode: string | null;
     referralLink: string | null;
@@ -132,9 +136,6 @@ class ReferralService {
     };
   }
 
-  /**
-   * Validate referral code
-   */
   validateReferralCode(code: string): boolean {
     const isValid = this.referralCodeMap.has(code);
     if (!isValid) {
@@ -143,18 +144,12 @@ class ReferralService {
     return isValid;
   }
 
-  /**
-   * Get referrer info by code
-   */
   getReferrerByCode(code: string): ReferralUser | null {
     const referrerId = this.referralCodeMap.get(code);
     if (!referrerId) return null;
     return this.referralStore.get(referrerId) || null;
   }
 
-  /**
-   * Get all referrals for a user
-   */
   getUserReferrals(userId: string): ReferralUser[] {
     const referrals: ReferralUser[] = [];
     this.referralStore.forEach((user) => {
@@ -165,21 +160,16 @@ class ReferralService {
     return referrals;
   }
 
-  /**
-   * Get user by referral code
-   */
   getUserByReferralCode(code: string): ReferralUser | null {
     const userId = this.referralCodeMap.get(code);
     if (!userId) return null;
     return this.referralStore.get(userId) || null;
   }
 
-  /**
-   * Clear all referral data (for testing)
-   */
   clearAll(): void {
     this.referralStore.clear();
     this.referralCodeMap.clear();
+    localStorage.removeItem(this.STORAGE_KEY);
     logger.info('[Referral] All referral data cleared');
   }
 }

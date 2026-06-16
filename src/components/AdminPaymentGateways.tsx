@@ -6,10 +6,14 @@ export default function AdminPaymentGateways() {
   const [selectedGateway, setSelectedGateway] = useState<GatewayType>('instamojo');
   const [copied, setCopied] = useState<string>('');
 
-  const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(id);
-    setTimeout(() => setCopied(''), 2000);
+  const copyToClipboard = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(id);
+      setTimeout(() => setCopied(''), 2000);
+    } catch {
+      setCopied(`error-${id}`);
+    }
   };
 
   const gatewayConfigs = {
@@ -24,7 +28,7 @@ export default function AdminPaymentGateways() {
         'Go to Settings → API & Webhooks',
         'Copy Client ID and Client Secret',
         'Add to Vercel environment variables',
-        'Set webhook URL: https://aatra-ai.vercel.app/api/instamojo/webhook',
+        `Set webhook URL: ${window.location.origin}/api/instamojo/webhook`,
         'Deploy and test',
       ],
       docs: 'INSTAMOJO_FREE_SETUP.md',
@@ -43,7 +47,7 @@ export default function AdminPaymentGateways() {
         'Go to Settings → API Keys',
         'Copy Key ID and Key Secret',
         'Add to Vercel environment variables',
-        'Set webhook URL: https://aatra-ai.vercel.app/api/razorpay/webhook',
+        `Set webhook URL: ${window.location.origin}/api/razorpay/webhook`,
         'Deploy and test with Razorpay test cards',
       ],
       docs: 'RAZORPAY_INDIA_SETUP.md',
@@ -158,7 +162,7 @@ export default function AdminPaymentGateways() {
                       <div className="flex items-center justify-between">
                         <code className="text-amber-300 font-mono text-sm">{env.key}</code>
                         <button
-                          onClick={() => copyToClipboard(env.key, env.key)}
+                          onClick={() => copyToClipboard(env.example, env.key)}
                           className={`transition-colors ${
                             copied === env.key ? 'text-green-400' : 'text-gray-400 hover:text-white'
                           }`}
@@ -256,13 +260,13 @@ export default function AdminPaymentGateways() {
                   Vercel Docs
                 </a>
                 <a
-                  href={`https://aatra-ai.vercel.app/docs/api`}
+                  href={`https://vercel.com/docs/functions`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-amber-300 hover:text-amber-200 transition-colors"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  API Documentation
+                  Vercel Functions Docs
                 </a>
               </div>
             </div>

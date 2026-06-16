@@ -7,20 +7,27 @@ import { createPayment, type GatewayType, GATEWAYS } from '../lib/payment-gatewa
 export default function Checkout() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const planId = searchParams.get('plan') || 'pro';
-  const gatewayParam = (searchParams.get('gateway') || 'instamojo') as GatewayType;
-  const [selectedGateway, setSelectedGateway] = useState<GatewayType>(gatewayParam);
-  const [selectedOffer, setSelectedOffer] = useState<string | null>(null);
+  const requestedPlanId = searchParams.get('plan') || searchParams.get('offer') || 'pro';
+  const offerFromParams = OFFERS.find(offer => offer.id === requestedPlanId) || null;
+  const planId = offerFromParams?.planId || requestedPlanId;
+  const plan = PAYMENT_PLANS.find(p => p.id === planId);
+  const [selectedGateway, setSelectedGateway] = useState<GatewayType>((searchParams.get('gateway') || 'instamojo') as GatewayType);
+  const [selectedOffer, setSelectedOffer] = useState<typeof offerFromParams>(offerFromParams);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
 
-  const plan = PAYMENT_PLANS.find(p => p.id === planId);
   if (!plan) return <div className="min-h-screen bg-[#080c18]" />;
 
+  const amount = selectedOffer
+    ? selectedOffer.discountedPrice || selectedOffer.price || selectedOffer.originalPrice || plan.price
+    : plan.price;
+  const billingLabel = selectedOffer?.period || plan.period;
+  const paymentPlanId = selectedOffer?.id || planId;
+
   const handleCheckout = async () => {
-    if (plan.price === 0) {
+    if (amount === 0) {
       navigate('/sign-up');
       return;
     }
@@ -33,24 +40,20 @@ export default function Checkout() {
     setLoading(true);
     setError(null);
     try {
-      console.log('[v0] Starting payment with gateway:', selectedGateway);
-      
-      const instamojoPlanId = `${planId.replace('-', '_')}_monthly`;
       const paymentData = await createPayment({
         gateway: selectedGateway,
-        planId: instamojoPlanId,
+        planId: paymentPlanId,
         email,
         phone,
-        amount: plan.price * 100, // Convert to paise
+        amount: amount * 100,
         currency: 'INR',
-        description: plan.name,
+        description: selectedOffer?.name || plan.name,
       });
 
       if (!paymentData.success || !paymentData.payment_url) {
         throw new Error(paymentData.error || 'Payment creation failed');
       }
 
-      console.log('[v0] Redirecting to payment gateway:', selectedGateway);
       window.location.assign(paymentData.payment_url);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Payment error occurred');
@@ -61,20 +64,18 @@ export default function Checkout() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-navy to-[#1e2332] text-white pt-20">
+    <div className="min-h-screen text-white pt-20" style={{ background: '#08060f' }}>
       <div className="max-w-4xl mx-auto px-6 lg:px-12">
-        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Checkout</h1>
-          <p className="text-gray-400">Complete your purchase and start using Astra Pro</p>
+          <p className="text-gray-400">Complete your purchase and start using Aatra AI</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-          {/* Plan Summary */}
           <div className="lg:col-span-2">
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 mb-6">
               <h2 className="text-2xl font-bold mb-6">{plan.name} Plan</h2>
-              
+
               <div className="space-y-4 mb-8">
                 {plan.features.map((feature, i) => (
                   <div key={i} className="flex items-center gap-3">
@@ -86,45 +87,44 @@ export default function Checkout() {
 
               <div className="border-t border-white/10 pt-6">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-gray-400">Monthly price:</span>
-                  <span className="text-3xl font-bold">₹{plan.price}</span>
+                  <span className="text-gray-400">Price{billingLabel}:</span>
+                  <span className="text-3xl font-bold">₹{amount}</span>
                 </div>
-                {plan.originalPrice && (
+                {selectedOffer?.originalPrice && (
                   <div className="flex justify-between items-center text-sm text-green-400">
                     <span>You save:</span>
-                    <span>₹{plan.originalPrice - plan.price}/month</span>
+                    <span>₹{selectedOffer.originalPrice - amount}/year</span>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Offers Section */}
             {OFFERS.length > 0 && (
               <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
                 <h3 className="text-xl font-bold mb-6">Special Offers</h3>
                 <div className="space-y-3">
                   {OFFERS.map(offer => (
                     <label key={offer.id} className={`flex items-center p-4 border rounded-xl cursor-pointer transition-colors ${
-                      selectedOffer === offer.id 
-                        ? 'bg-amber-500/20 border-amber-400' 
+                      selectedOffer?.id === offer.id
+                        ? 'bg-amber-500/20 border-amber-400'
                         : 'border-white/10 hover:border-white/20'
                     }`}>
                       <input
                         type="radio"
                         name="offer"
                         value={offer.id}
-                        checked={selectedOffer === offer.id}
-                        onChange={(e) => setSelectedOffer(e.target.value)}
+                        checked={selectedOffer?.id === offer.id}
+                        onChange={() => setSelectedOffer(offer)}
                         className="w-4 h-4"
                       />
                       <div className="ml-3 flex-1">
                         <div className="font-semibold">{offer.name}</div>
                         {offer.discount && <div className="text-sm text-green-400">{offer.discount} discount</div>}
                       </div>
-                      {offer.discountedPrice && (
+                      {(offer.discountedPrice || offer.price) && (
                         <div className="text-right">
-                          <div className="font-bold">₹{offer.discountedPrice}</div>
-                          <div className="text-sm text-gray-400">was ₹{offer.originalPrice}</div>
+                          <div className="font-bold">₹{offer.discountedPrice || offer.price}</div>
+                          <div className="text-sm text-gray-400">{offer.period}</div>
                         </div>
                       )}
                     </label>
@@ -134,26 +134,24 @@ export default function Checkout() {
             )}
           </div>
 
-          {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-gradient-to-b from-white/10 to-white/5 border border-white/10 rounded-2xl p-6 sticky top-20">
               <h3 className="text-lg font-bold mb-6">Order Summary</h3>
 
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between">
-                  <span className="text-gray-400">{plan.name} Plan</span>
-                  <span>₹{plan.price}/mo</span>
+                  <span className="text-gray-400">{selectedOffer?.name || plan.name}</span>
+                  <span>₹{amount}{billingLabel}</span>
                 </div>
                 {selectedOffer && (
                   <div className="flex justify-between text-green-400">
-                    <span>{selectedOffer}</span>
-                    <span>-₹{OFFERS.find(o => o.id === selectedOffer)?.savings || 0}</span>
+                    <span>{selectedOffer.discount}</span>
+                    <span>-₹{selectedOffer.savings || 0}</span>
                   </div>
                 )}
               </div>
 
               <div className="border-t border-white/10 pt-6 mb-6">
-                {/* Payment Gateway Selection */}
                 <div className="mb-6">
                   <label className="block text-sm font-medium mb-3">Payment Gateway</label>
                   <div className="grid grid-cols-2 gap-2">
@@ -173,7 +171,6 @@ export default function Checkout() {
                   </div>
                 </div>
 
-                {/* Email and Phone Fields */}
                 <div className="space-y-3 mb-6">
                   <div>
                     <label className="block text-sm font-medium mb-2">Email</label>
@@ -200,9 +197,9 @@ export default function Checkout() {
                 </div>
                 <div className="flex justify-between text-xl font-bold">
                   <span>Total</span>
-                  <span>₹{plan.price}</span>
+                  <span>₹{amount}</span>
                 </div>
-                <div className="text-sm text-gray-400 mt-2">Billed monthly</div>
+                <div className="text-sm text-gray-400 mt-2">Billed {billingLabel}</div>
               </div>
 
               <button
@@ -210,7 +207,7 @@ export default function Checkout() {
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-amber-400 to-cyan-400 text-[#080c18] py-3 rounded-full font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
               >
-                {loading ? 'Processing...' : plan.price === 0 ? 'Get Started' : 'Proceed to Payment'}
+                {loading ? 'Processing...' : amount === 0 ? 'Get Started' : 'Proceed to Payment'}
               </button>
 
               {error && (

@@ -1,5 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { createHmac } from 'crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 
 interface VerifyPaymentRequest {
   orderId: string;
@@ -12,31 +11,46 @@ interface ErrorResponse {
   message?: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Record<string, unknown> | ErrorResponse>
-) {
+type RazorpayResponse = Record<string, unknown> | ErrorResponse;
+
+function jsonResponse(status: number, body: RazorpayResponse) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'content-type': 'application/json' },
+  });
+}
+
+function jsonError(status: number, error: string, message?: string) {
+  return jsonResponse(status, message ? { error, message } : { error });
+}
+
+async function readJson(req: Request): Promise<Record<string, unknown>> {
+  try {
+    return (await req.json()) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
+
+export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return jsonResponse(405, { error: 'Method not allowed' });
   }
 
   try {
-    const { orderId, paymentId, signature } = req.body as VerifyPaymentRequest;
+    const { orderId, paymentId, signature } = (await readJson(req)) as VerifyPaymentRequest;
 
     if (!orderId || !paymentId || !signature) {
-      return res.status(400).json({ error: 'Missing required fields' });
+      return jsonResponse(400, { error: 'Missing required fields' });
     }
 
     console.log('[v0] Razorpay: Verifying payment:', paymentId);
 
-    // In production, verify signature with Razorpay secret
-    // For now, accept all signatures in demo mode
     const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
-    
+
     if (!KEY_SECRET) {
-      // Demo mode
       console.log('[v0] Razorpay: Demo mode - accepting payment');
-      return res.status(200).json({
+      return jsonResponse(200, {
         success: true,
         mode: 'demo',
         status: 'verified',
@@ -45,31 +59,31 @@ export default async function handler(
       });
     }
 
-    // Production: Verify with HMAC SHA256
     const body = `${orderId}|${paymentId}`;
     const expectedSignature = createHmac('sha256', KEY_SECRET).update(body).digest('hex');
 
-    if (expectedSignature === signature) {
+    if (timingSafeEqualHex(expectedSignature, signature)) {
       console.log('[v0] Razorpay: Payment verified successfully');
-      return res.status(200).json({
+      return jsonResponse(200, {
         success: true,
         mode: 'production',
         status: 'verified',
         payment_id: paymentId,
         order_id: orderId,
       });
-    } else {
-      console.error('[v0] Razorpay: Signature mismatch');
-      return res.status(400).json({
-        error: 'Payment verification failed',
-        message: 'Signature mismatch',
-      });
     }
+
+    console.error('[v0] Razorpay: Signature mismatch');
+    return jsonError(400, 'Payment verification failed', 'Signature mismatch');
   } catch (error) {
     console.error('[v0] Razorpay verification error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
+    return jsonError(500, 'Internal server error', error instanceof Error ? error.message : 'Unknown error');
   }
+}
+
+function timingSafeEqualHex(a: string, b: string): boolean {
+  const left = Buffer.from(a, 'hex');
+  const right = Buffer.from(b, 'hex');
+  if (left.length !== right.length) return false;
+  return timingSafeEqual(left, right);
 }

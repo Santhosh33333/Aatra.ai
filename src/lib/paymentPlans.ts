@@ -19,7 +19,7 @@ export const PAYMENT_PLANS = [
   {
     id: 'pro',
     name: 'Pro',
-    price: 900,
+    price: 799,
     currency: '₹',
     period: '/month',
     originalPrice: 1800,
@@ -88,6 +88,7 @@ export const OFFERS = [
     price: 3900,
     currency: '₹',
     period: '/month',
+    planId: 'pro',
     description: 'Up to 5 family members',
     features: ['Unlimited for all', 'Shared library', 'Parental controls'],
     discount: 'Save ₹1,600/month',

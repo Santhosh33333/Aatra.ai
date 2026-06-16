@@ -111,7 +111,7 @@ View in Stripe Dashboard:
 ## Admin Configuration
 
 **Admin Email**: santhoshkrishna958@gmail.com
-**Admin Password**: 300703S#s
+**Admin Password**: Keep this only in your secure deployment environment; do not publish it in docs or code.
 **Support Hours**: Mon-Fri 9AM-6PM IST
 **Location**: India
 

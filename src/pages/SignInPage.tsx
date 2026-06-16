@@ -1,8 +1,30 @@
-import { SignIn } from '@clerk/clerk-react';
-import { Link } from 'react-router';
+import { SignIn, useAuth } from '@clerk/clerk-react';
+import { Link, Navigate } from 'react-router';
 import { Sparkles } from 'lucide-react';
+import { useEffect } from 'react';
+import { logger } from '../lib/logger';
 
 export default function SignInPage() {
+  const { isSignedIn, isLoaded } = useAuth();
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      logger.info('[SignIn] User authenticated, redirecting to dashboard');
+    }
+  }, [isLoaded, isSignedIn]);
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#08060f' }}>
+        <div className="w-8 h-8 rounded-full border-2 border-violet-500 border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  if (isSignedIn) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#08060f' }}>
       <div className="fixed inset-0 pointer-events-none">
@@ -32,7 +54,13 @@ export default function SignInPage() {
             <h1 className="text-3xl font-bold text-white mb-2">Welcome back</h1>
             <p className="text-gray-500">Sign in to your Aatra AI account</p>
           </div>
-          <SignIn signUpUrl="/sign-up" forceRedirectUrl="/dashboard" />
+          <SignIn
+            routing="path"
+            path="/sign-in"
+            signUpUrl="/sign-up"
+            forceRedirectUrl="/dashboard"
+            fallbackRedirectUrl="/dashboard"
+          />
         </div>
       </div>
     </div>
